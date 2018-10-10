@@ -1,6 +1,12 @@
 # arradio
 CLI for listening ShoutCAST radio stations
 
+## Installation ##
+Paste that at a Terminal prompt. By default arradio will be installed in /usr/local/bin.
+```
+curl -fsSL https://raw.githubusercontent.com/sepen/arradio/master/install | bash
+```
+
 ## Usage ##
 ```
 Usage: arradio <command> [options]
