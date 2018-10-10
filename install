@@ -24,7 +24,7 @@ done
 mkdir -p $ARRADIO_HOME/favorites
 
 # Install with sudo
-curl -fsSL https://raw.githubusercontent.com/sepen/arradio/master/arradio /tmp/arradio
+curl -fsSL https://raw.githubusercontent.com/sepen/arradio/master/arradio -o /tmp/arradio
 sudo install -m 0755 /tmp/arradio $ARRADIO_PREFIX/bin/arradio || msgError "sudo privileges required"
 
 # End of file
