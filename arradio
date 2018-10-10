@@ -1,0 +1,182 @@
+#!/usr/bin/env bash
+
+# arradio: shoutcast command line client
+# Copyleft by Jose V Beneyto, <sepen@crux.nu>
+
+# xmllint binary required
+
+# OSX installation
+# export PATH=$PATH:"/Applications/MPlayer OSX Extended.app/Contents/Resources/Binaries/mpextended.mpBinaries/Contents/MacOS/mplayer"
+
+msgUsage() {
+  echo "Usage: $(basename $0) <command> [options]"
+  echo "Where commands are:"
+  echo "  top500              Get top500 radio stations"
+  echo "  random              Get random list of radio stations"
+  echo "  search  <string>    Search for radio stations by keyword"
+  echo "  listen  <id>        Listen specified StationID"
+  echo "  fadd    <id>        Add radio station to your favourites"
+  echo "  fdel    <id>        Delete radio station from your favourites"
+  echo "  flist               List favourites radio stations"
+  echo "  help                Show this help information"
+  echo "  version             Show version information"
+  exit 0
+}
+
+msgVersion() {
+  echo "arradio 1.0 (bash version) by Jose V Beneyto, <sepen@crux.nu>"
+}
+
+outfilter() {
+  cat - \
+  | xmllint --format - \
+  | grep 'station name' \
+  | sed -e 's|.* name="|StationName:\\t|' \
+        -e 's| mt="|\\nMediaType:\\t|' \
+        -e 's| id="|\\nStationID:\\t|' \
+        -e 's| br="|\\nBitrate:\\t|' \
+        -e 's| genre="|\\nGenre:\\t\\t|' \
+        -e 's| ct="|\\nPlaying:\\t|' \
+        -e 's| lc=".*$|\\n|' \
+  | sed -e 's/"//g' \
+  | sed -e 's|\&amp;|\&|g' \
+  | sed -e 's/\\n/\'$'\n/g' -e 's/\\t/\'$'\t/g' -e 's|\$||g'
+}
+
+checkDeps() {
+  for dep in xmllint curl; do
+    if [ ! "$(which $dep)" ]; then
+	  echo "$dep binary not found"
+	  exit 1
+	fi
+  done
+}
+
+getopts() {
+  while [ $1 ]; do
+    case $1 in
+      --limit|-l)
+        LIMIT="$2"
+        shift 2
+        ;;
+    esac
+    shift
+  done
+}
+
+# shoutcast api (new/legacy)
+# http://wiki.winamp.com/wiki/SHOUTcast_Radio_Directory_API
+top500() {
+  curl -s "${URL}Top500?k=${ID}&limit=${LIMIT}" | outfilter
+}
+search() {
+  [ $# -lt 1 ] && msgUsage
+  local string="$1"
+  curl -s "${URL}stationsearch?k=${ID}&search=${string}&limit=${LIMIT}" | outfilter
+}
+random() {
+  curl -s "${URL2}randomstations?k=${ID}&f=xml&limit=${LIMIT}" | outfilter
+}
+listen() {
+  [ $# -lt 1 ] && msgUsage
+  local id="$1"
+  curl -o $TMPFILE -s "http://yp.shoutcast.com/sbin/tunein-station.pls?id=${id}"
+  if ! grep -q 'numberofentries=0' $TMPFILE; then
+    $MPLAYER $(grep 'File1' $TMPFILE | cut -d'=' -f2)
+  fi
+}
+
+# operations with favourites
+fadd() {
+  [ $# -lt 1 ] && msgUsage
+  local id="$1"
+  [ ! -d $FAVDIR ] && mkdir -p $FAVDIR
+  curl -o $TMPFILE -s "http://yp.shoutcast.com/sbin/tunein-station.pls?id=${id}"
+  if ! grep -q 'numberofentries=0' $TMPFILE; then
+    cp -f $TMPFILE $FAVDIR/$id
+  fi
+}
+fdel() {
+  [ $# -lt 1 ] && msgUsage
+  local id="$1" 
+  rm -f $FAVDIR/$id
+}
+flist() {
+  if [ -d $FAVDIR ]; then
+    for FAV in $FAVDIR/*; do
+      printf "%8d " "$(basename $FAV)"
+      grep 'Title1=' $FAV | cut -d')' -f2 | sed 's/^ //'
+    done
+  fi
+}
+
+export LC_ALL=C
+
+#readonly MPLAYER="mplayer -cache 8192"
+#readonly MPLAYER="mplayer -cache 4096"
+readonly MPLAYER="mplayer -nocache"
+#readonly MPLAYER="vlc"
+
+readonly TMPFILE=$(mktemp /tmp/$(basename $0).XXX)
+readonly FAVDIR="$HOME/.$(basename $0)/favorites"
+
+# TODO:
+# id for now from this source code (need to have own partner_id)
+# http://members.home.nl/djheemstra/MeediOS/MeeMedia_plugins/SHOUTcast%20Radio/SHOUTcast.cs
+readonly ID="sh17tOUi_ezL61_A"
+
+readonly URL="http://api.shoutcast.com/legacy/"
+readonly URL2="http://api.shoutcast.com/station/"
+
+LIMIT="500" # required for top500
+
+checkDeps
+
+[ $# -eq 0 ] && msgUsage
+
+getopts $@
+
+while [ $1 ]; do
+  case $1 in
+    top500)
+      top500
+      break
+      ;;
+    search)
+      shift 1
+      search $1
+      break
+      ;;
+    random)
+      random
+      break
+      ;;
+    listen)
+      shift 1
+      listen $1
+      break
+      ;;
+    fadd)
+      shift 1
+      fadd $1
+      break
+      ;;
+    fdel)
+      shift 1
+      fdel $1
+      break
+      ;;
+    flist)
+      flist
+      break
+      ;;
+    *)
+      msgUsage
+      ;;
+  esac
+  shift
+done
+
+rm -f $TMPFILE
+
+# End of file
