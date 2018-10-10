@@ -14,6 +14,8 @@ Where commands are:
   flist               List favourites radio stations
   help                Show this help information
   version             Show version information
+Options available:
+  -l <number>  Limit the number of stations to search and display
 ```
 
 ## Example ##
