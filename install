@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+ARRADIO_PREFIX=/usr/local
+ARRADIO_HOME=$HOME/.arradio
+
+msgError() {
+  echo "ERROR: $@" 2>&1
+  exit 1
+}
+
+# Check for dependencies
+for dep in xmllint curl; do
+  which $dep >/dev/null 2>&1 || msgError "dependency not found '$dep'"
+done
+
+# Check for player application
+found=0
+for player in mplayer vlc; do
+  which $player >/dev/null 2>&1 && found=1
+done
+[ $found -eq 0 ] && msgError "player application not found. MPlayer and/or VLC is required"
+
+# Create HOME stuff
+mkdir -p $ARRADIO_HOME/favorites
+
+# Install with sudo
+sudo install -m 0755 arradio $ARRADIO_PREFIX/arradio || msgError "sudo privileges required"
+
+# End of file
