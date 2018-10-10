@@ -30,6 +30,11 @@ msgVersion() {
   exit 0
 }
 
+msgError() {
+  echo "ERROR: $@" 2>&1
+  exit 1
+}
+
 outfilter() {
   cat - \
   | xmllint --format - \
@@ -48,11 +53,14 @@ outfilter() {
 
 checkDeps() {
   for dep in xmllint curl; do
-    if [ ! "$(which $dep)" ]; then
-	  echo "$dep binary not found"
-	  exit 1
-	fi
+    which $dep >/dev/null 2>&1 || "$dep binary not found"
   done
+  # Check for player application
+  found=0
+  for player in mplayer vlc; do
+    which $player >/dev/null 2>&1 && found=1
+  done
+  [ $found -eq 0 ] && msgError "player application not found. MPlayer and/or VLC is required"
 }
 
 getopts() {

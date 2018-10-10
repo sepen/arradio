@@ -20,10 +20,11 @@ for player in mplayer vlc; do
 done
 [ $found -eq 0 ] && msgError "player application not found. MPlayer and/or VLC is required"
 
-# Create HOME stuff
+# Create HOME stuff
 mkdir -p $ARRADIO_HOME/favorites
 
-# Install with sudo
-sudo install -m 0755 arradio $ARRADIO_PREFIX/arradio || msgError "sudo privileges required"
+# Install with sudo
+curl -fsSL https://raw.githubusercontent.com/sepen/arradio/master/arradio /tmp/arradio
+sudo install -m 0755 /tmp/arradio $ARRADIO_PREFIX/bin/arradio || msgError "sudo privileges required"
 
-# End of file
+# End of file
