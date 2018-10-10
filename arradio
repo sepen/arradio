@@ -20,11 +20,14 @@ msgUsage() {
   echo "  flist               List favourites radio stations"
   echo "  help                Show this help information"
   echo "  version             Show version information"
+  echo "Options available:"
+  echo "  -l <number>  Limit the number of stations to search and display"
   exit 0
 }
 
 msgVersion() {
-  echo "arradio 1.0 (bash version) by Jose V Beneyto, <sepen@crux.nu>"
+  echo "arradio 1.0 (Bash version) by Jose V Beneyto, <sepen@crux.nu>"
+  exit 0
 }
 
 outfilter() {
