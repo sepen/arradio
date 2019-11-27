@@ -1,5 +1,9 @@
 # arradio
-CLI for listening ShoutCAST radio stations
+CLI for listening ShoutCAST radio stations.\
+\
+The main utility of _arradio_ is to search for radio stations in the ShoutCAST directory, save the favorite radio stations for later and avoid manual link management to the streaming url for every time you want to listen to a radio station.\
+\
+This program does not play streams directly, this is delegated to _mplayer_ or _vlc_ program, so one of these programs must be previously installed.
 
 ## Installation ##
 Paste that at a Terminal prompt. By default arradio will be installed in _/usr/local/bin_:
