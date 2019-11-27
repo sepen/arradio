@@ -15,15 +15,15 @@ curl -fsSL https://raw.githubusercontent.com/sepen/arradio/master/install | INST
 ```
 Usage: arradio <command> [options]
 Where commands are:
-  top500              Get top500 radio stations
-  random              Get random list of radio stations
-  search  <string>    Search for radio stations by keyword
-  listen  <id>        Listen specified StationID
-  fadd    <id>        Add radio station to your favourites
-  fdel    <id>        Delete radio station from your favourites
-  flist               List favourites radio stations
-  help                Show this help information
-  version             Show version information
+  top500               Get top500 radio stations
+  random               Get random list of radio stations
+  search  <Keywords>   Search for radio stations by keyword
+  listen  <StationId>  Listen specified StationID
+  fadd    <StationId>  Add radio station to your favourites
+  fdel    <StationId>  Delete radio station from your favourites
+  flist                List favourites radio stations
+  help                 Show this help information
+  version              Show version information
 Options available:
   -l <number>  Limit the number of stations to search and display
   -w           Wide output format
@@ -31,9 +31,7 @@ Options available:
 
 ## Example ##
 
-I want to find radio stations with the words _smooth_ and _jazz_.
-I limit the list to only 2 stations.
-I want wide output format.
+I want to find radio stations with the words _smooth_ and _jazz_. I limit the list to only 2 stations _(-l 2)_ and I want wide output format _(-w)_.
 ```
 $ arradio search smooth jazz -l 2 -w
 StationName:	SmoothJazz.com Global
@@ -50,7 +48,7 @@ Genre:		Smooth Jazz genre2=Acid Jazz genre3=Jazz genre4=Easy Listening genre5=Ja
 Playing:	Brian Simpson - Out Of A Dream (Featuring Najee)
 ```
 
-Now I want to listen to the radio station. To do this I use the value of _StationID_.
+Now I want to listen the second radio station in the list. To do this I use the value of _StationID_.
 ```
 $ arradio listen 1541073
 ```
@@ -60,8 +58,14 @@ I like it, so I add it to my favorites.
 $ arradio fadd 1541073
 ```
 
-I do not like it anymore. I remove it from my favorites.
+I want to list my favourites.
 ```
 $ arradio flist
  1541073 Smooth Jazz CD101.9 New York 64K
 ```
+
+I do not like it anymore. I remove it from my favorites.
+```
+$ arradio fdel 1541073
+```
+
