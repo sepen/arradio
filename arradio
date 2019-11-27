@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
-
+#
 # arradio: shoutcast command line client
 # Copyleft by Jose V Beneyto, <sepen@crux.nu>
-
-# xmllint binary required
-
-# OSX installation
-# export PATH=$PATH:"/Applications/MPlayer OSX Extended.app/Contents/Resources/Binaries/mpextended.mpBinaries/Contents/MacOS/mplayer"
+#
+# Dependencies:
+# xmllint and curl binaries are required
+# mplayer of vlc is required to play streaming urls
 
 msgUsage() {
   echo "Usage: $(basename $0) <command> [options]"
@@ -22,6 +21,7 @@ msgUsage() {
   echo "  version             Show version information"
   echo "Options available:"
   echo "  -l <number>  Limit the number of stations to search and display"
+  echo "  -w           Wide output format"
   exit 0
 }
 
@@ -48,27 +48,40 @@ outfilter() {
         -e 's| lc=".*$|\\n|' \
   | sed -e 's/"//g' \
   | sed -e 's|\&amp;|\&|g' \
-  | sed -e 's/\\n/\'$'\n/g' -e 's/\\t/\'$'\t/g' -e 's|\$||g'
+  | sed -e 's/\\n/\'$'\n/g' -e 's/\\t/\'$'\t/g' -e 's|\$||g' \
+  | \
+  (
+    if [[ $WIDE -eq 0 ]]; then
+      grep -ve 'MediaType:' -ve 'Bitrate' -ve 'Genre:'
+    else
+      cat -
+    fi
+  )
 }
 
 checkDeps() {
   for dep in xmllint curl; do
-    which $dep >/dev/null 2>&1 || "$dep binary not found"
+    which $dep >/dev/null 2>&1
+   [[ $? -ne 0 ]] && "$dep binary not found"
   done
   # Check for player application
-  found=0
+  : ${found:=0}
   for player in mplayer vlc; do
-    which $player >/dev/null 2>&1 && found=1
+    which $player >/dev/null 2>&1
+    [[ $? -eq 0 ]] && found=1
   done
-  [ $found -eq 0 ] && msgError "player application not found. MPlayer and/or VLC is required"
+  [[ $found -eq 0 ]] && msgError "player application not found. MPlayer and/or VLC is required"
 }
 
 getopts() {
-  while [ $1 ]; do
+  while [[ $1 ]]; do
     case $1 in
       --limit|-l)
-        LIMIT="$2"
-        shift 2
+        LIMIT=$2
+        shift
+        ;;
+      --wide|-w)
+        WIDE=1
         ;;
     esac
     shift
@@ -93,7 +106,7 @@ listen() {
   local id="$1"
   curl -o $TMPFILE -s "http://yp.shoutcast.com/sbin/tunein-station.pls?id=${id}"
   if ! grep -q 'numberofentries=0' $TMPFILE; then
-    $MPLAYER $(grep 'File1' $TMPFILE | cut -d'=' -f2)
+    $PLAYER $(grep 'File1' $TMPFILE | cut -d'=' -f2)
   fi
 }
 
@@ -123,10 +136,8 @@ flist() {
 
 export LC_ALL=C
 
-#readonly MPLAYER="mplayer -cache 8192"
-#readonly MPLAYER="mplayer -cache 4096"
-readonly MPLAYER="mplayer -nocache"
-#readonly MPLAYER="vlc"
+#readonly PLAYER="mplayer -nocache"
+readonly PLAYER="vlc"
 
 readonly TMPFILE=$(mktemp /tmp/$(basename $0).XXX)
 readonly FAVDIR="$HOME/.$(basename $0)/favorites"
@@ -139,7 +150,8 @@ readonly ID="sh17tOUi_ezL61_A"
 readonly URL="http://api.shoutcast.com/legacy/"
 readonly URL2="http://api.shoutcast.com/station/"
 
-LIMIT="500" # required for top500
+: ${LIMIT:=500} # required for top500
+: ${WIDE:=0} # required for wide output format
 
 checkDeps
 
@@ -155,7 +167,7 @@ while [ $1 ]; do
       ;;
     search)
       shift 1
-      search $1
+      search $@
       break
       ;;
     random)

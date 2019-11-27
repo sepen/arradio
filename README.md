@@ -26,11 +26,16 @@ Where commands are:
   version             Show version information
 Options available:
   -l <number>  Limit the number of stations to search and display
+  -w           Wide output format
 ```
 
 ## Example ##
+
+I want to find radio stations with the words _smooth_ and _jazz_.
+I limit the list to only 2 stations.
+I want wide output format.
 ```
-$ arradio search smooth jazz -l 2
+$ arradio search smooth jazz -l 2 -w
 StationName:	SmoothJazz.com Global
 MediaType:	audio/mpeg
 StationID:	1477271
@@ -44,12 +49,18 @@ Bitrate:	128
 Genre:		Smooth Jazz genre2=Acid Jazz genre3=Jazz genre4=Easy Listening genre5=Jazz logo=http://i.radionomy.com/document/radios/d/d8d7/d8d7a5f6-df88-4bd9-b5b2-e02b4fcaf661.jpg
 Playing:	Brian Simpson - Out Of A Dream (Featuring Najee)
 ```
+
+Now I want to listen to the radio station. To do this I use the value of _StationID_.
 ```
 $ arradio listen 1541073
 ```
+
+I like it, so I add it to my favorites.
 ```
 $ arradio fadd 1541073
 ```
+
+I do not like it anymore. I remove it from my favorites.
 ```
 $ arradio flist
  1541073 Smooth Jazz CD101.9 New York 64K
