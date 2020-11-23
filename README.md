@@ -5,6 +5,8 @@ The main utility of _arradio_ is to search for radio stations in the ShoutCAST d
 \
 This program does not play streams directly, this is delegated to _mplayer_ or _vlc_ program, so one of these programs must be previously installed.
 
+![demo](demo/arradio.gif)
+
 ## Installation ##
 Paste that at a Terminal prompt. By default arradio will be installed in _/usr/local/bin_:
 ```
