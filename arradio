@@ -5,7 +5,7 @@
 #
 # Dependencies:
 # xmllint and curl binaries are required
-# mplayer of vlc is required to play streaming urls
+# mpv or mplayer of vlc is required to play streaming urls
 
 msgUsage() {
   echo "Usage: $(basename $0) <command> [options]"
@@ -26,7 +26,7 @@ msgUsage() {
 }
 
 msgVersion() {
-  echo "arradio 1.0 (Bash version) by Jose V Beneyto, <sepen@crux.nu>"
+  echo "arradio 1.1 (Bash version) by Jose V Beneyto, <sepen@crux.nu>"
   exit 0
 }
 
@@ -66,11 +66,11 @@ checkDeps() {
   done
   # Check for player application
   : ${found:=0}
-  for player in mplayer vlc; do
+  for player in mpv mplayer vlc; do
     which $player >/dev/null 2>&1
     [[ $? -eq 0 ]] && found=1
   done
-  [[ $found -eq 0 ]] && msgError "player application not found. MPlayer and/or VLC is required"
+  [[ $found -eq 0 ]] && msgError "player application not found. mpv or mplayer or vlc is required"
 }
 
 getopts() {
@@ -136,8 +136,9 @@ flist() {
 
 export LC_ALL=C
 
+readonly PLAYER="mpv --no-video"
 #readonly PLAYER="mplayer -nocache"
-readonly PLAYER="vlc"
+#readonly PLAYER="vlc"
 
 readonly TMPFILE=$(mktemp /tmp/$(basename $0).XXX)
 readonly FAVDIR="$HOME/.$(basename $0)/favorites"

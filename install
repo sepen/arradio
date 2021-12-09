@@ -16,13 +16,13 @@ for dep in xmllint curl; do
   [[ $? -ne 0 ]] && msgError "dependency not found '$dep'"
 done
 
-# Check for player application
+# Check for player application
 : ${found:=0}
-for player in mplayer vlc; do
+for player in mpv mplayer vlc; do
   which $player >/dev/null 2>&1
   [[ $? -eq 0 ]] && found=1
 done
-[[ $found -eq 0 ]] && msgError "player application not found. MPlayer and/or VLC is required"
+[[ $found -eq 0 ]] && msgError "player application not found. mpv, mplayer or vlc is required"
 
 # Create HOME's stuff
 mkdir -p $ARRADIO_HOME/favorites
