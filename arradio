@@ -116,7 +116,7 @@ arradio-get-opts() {
 arradio-self-install() {
   arradio-check-deps "mkdir" "curl" "chmod"
   if [ -d ${ARRADIO_BINDIR} ]; then
-    arradio-msg-error "arradio previously installed. Please remove it or run 'self update' command."
+    arradio-msg-error "arradio previously installed. Please remove it or run 'self-update' command."
   fi
   arradio-msg-debug "Installing arradio to ${ARRADIO_HOME}"
   mkdir -p ${ARRADIO_HOME} ${ARRADIO_BINDIR} ${ARRADIO_FAVDIR}
