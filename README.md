@@ -1,4 +1,4 @@
-<img src="http://simpleicon.com/wp-content/uploads/radio.svg" width="200">
+<img src="https://github.com/sepen/arradio/assets/11802175/5a96278b-19ff-4e06-8871-846adb48d3fd" width="200">
 
 # `arradio`
 
