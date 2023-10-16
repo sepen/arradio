@@ -1,41 +1,61 @@
-# arradio
-CLI for listening ShoutCAST radio stations.\
-\
+<img src="http://simpleicon.com/wp-content/uploads/radio.svg" width="200">
+
+# `arradio`
+
+Listen to radio stations from the terminal.\
+
+![Last Commit](https://img.shields.io/github/last-commit/sepen/k8kreator)
+![Repo Size](https://img.shields.io/github/repo-size/sepen/k8kreator)
+![Code Size](https://img.shields.io/github/languages/code-size/sepen/k8kreator)
+![Proudly Written in Bash](https://img.shields.io/badge/written%20in-bash-ff69b4)
+
 The main utility of _arradio_ is to search for radio stations in the ShoutCAST directory, save the favorite radio stations for later and avoid manual link management to the streaming url for every time you want to listen to a radio station.\
 \
-This program does not play streams directly, this is delegated to _mplayer_ or _vlc_ program, so one of these programs must be previously installed.
+This program does not play streams directly, this is delegated to _mpv_, _mplayer_ or _vlc_ program, so one of these programs must be previously installed.
 
 ![demo](demo/arradio.gif)
 
-## Installation ##
-Paste that at a Terminal prompt. By default arradio will be installed in _/usr/local/bin_:
+---
+
+## Installation
+
+To install **arradio** paste that in a macOS Terminal or Linux shell prompt:
 ```
-curl -fsSL https://raw.githubusercontent.com/sepen/arradio/master/install | bash
-```
-You can use an alternate directory for installation, e.g: _$HOME/bin_:
-```
-curl -fsSL https://raw.githubusercontent.com/sepen/arradio/master/install | INSTALL_DIR=$HOME/bin bash
+$ curl -fsSL https://raw.githubusercontent.com/sepen/arradio/master/arradio | bash -s self-install
 ```
 
-## Usage ##
+The one-liner command from above installs **arradio** to its default, `$HOME/.arradio` and will place some files under that prefix, so you'll need to set your PATH like this `export PATH=$HOME/.arradio/bin:$PATH`. \
+The installation explains what it will do, and you will see all that information. Consider adding this line to your _~/.bashrc_ or _~/.bash_profile_ or make sure to export this _PATH_ before running **arradio**. The installation explains what it will do. \
+The one-liner installation method found on **arradio** uses Bash. Notably, zsh, fish, tcsh and csh will not work.
+
+---
+
+## Usage
 ```
-Usage: arradio <command> [options]
-Where commands are:
-  top500               Get top500 radio stations
-  random               Get random list of radio stations
-  search  <Keywords>   Search for radio stations by keyword
-  listen  <StationId>  Listen specified StationID
-  fadd    <StationId>  Add radio station to your favourites
-  fdel    <StationId>  Delete radio station from your favourites
-  flist                List favourites radio stations
-  help                 Show this help information
-  version              Show version information
-Options available:
-  -l <number>  Limit the number of stations to search and display
-  -w           Wide output format
+Usage:
+  arradio [command]
+
+Available Commands:
+  top500             Get arradio-top500 radio stations
+  random             Get random list of radio stations
+  search  string     Search for radio stations by keyword
+  listen  id         Listen specified StationSHOUTCAST_API_ID
+  fadd    id         Add radio station to your favourites
+  fdel    id         Delete radio station from your favourites
+  flist              List favourites radio stations
+  help               Show this help information
+  version            Show version information
+  self-install       Install arradio itself
+  self-update        Update arradio itself
+
+Flags::
+  -l number          Limit the number of stations to search and display
+  -w                 Wide output format
 ```
 
-## Example ##
+---
+
+## Examples
 
 I want to find radio stations with the words _smooth_ and _jazz_. I limit the list to only 2 stations _(-l 2)_ and I want wide output format _(-w)_.
 ```
@@ -74,4 +94,3 @@ I do not like it anymore. I remove it from my favorites.
 ```
 $ arradio fdel 1541073
 ```
-

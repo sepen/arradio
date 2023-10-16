@@ -1,41 +1,88 @@
 #!/usr/bin/env bash
 #
-# arradio: shoutcast command line client
-# Copyleft by Jose V Beneyto, <sepen@crux.nu>
+# arradio: SHOUTcast command line client
 #
 # Dependencies:
-# xmllint and curl binaries are required
-# mpv or mplayer of vlc is required to play streaming urls
+#   xmllint and curl binaries are required
+#   mpv or mplayer or vlc is required to play streaming urls
 
-msgUsage() {
-  echo "Usage: $(basename $0) <command> [options]"
-  echo "Where commands are:"
-  echo "  top500              Get top500 radio stations"
-  echo "  random              Get random list of radio stations"
-  echo "  search  <string>    Search for radio stations by keyword"
-  echo "  listen  <id>        Listen specified StationID"
-  echo "  fadd    <id>        Add radio station to your favourites"
-  echo "  fdel    <id>        Delete radio station from your favourites"
-  echo "  flist               List favourites radio stations"
-  echo "  help                Show this help information"
-  echo "  version             Show version information"
-  echo "Options available:"
-  echo "  -l <number>  Limit the number of stations to search and display"
-  echo "  -w           Wide output format"
-  exit 0
+
+# =============================================================================
+# HELPER FUNCTIONS
+# =============================================================================
+
+arradio-msg-debug() {
+  local msgprefix='\033[1;33m**'
+  local msgsuffix='\033[0m'
+  if [ ${ARRADIO_DEBUG} -eq 1 ]; then
+    [ ${ARRADIO_NOCOLOR} -eq 1 ] && msgprefix='[debug]'
+    echo -e "${msgprefix}${msgsuffix} $@"
+  fi
 }
 
-msgVersion() {
-  echo "arradio 1.1 (Bash version) by Jose V Beneyto, <sepen@crux.nu>"
-  exit 0
+arradio-msg-info() {
+  local msgprefix='\033[1;34m**'
+  local msgsuffix='\033[0m'
+  [ ${ARRADIO_NOCOLOR} -eq 1 ] && msgprefix='**'
+  echo -e "${msgprefix}${msgsuffix} $@"
 }
 
-msgError() {
-  echo "ERROR: $@" 2>&1
+arradio-msg-error() {
+  local msgprefix='\033[1;31m**'
+  local msgsuffix='\033[0m'
+  [ ${ARRADIO_NOCOLOR} -eq 1 ] && msgprefix='[error]'
+  echo -e "${msgprefix}${msgsuffix} $@" 2>&1
   exit 1
 }
 
-outfilter() {
+arradio-print-version() {
+  echo "arradio v${ARRADIO_VERSION}"
+  exit 0
+}
+
+arradio-print-help() {
+  cat << __HELP__
+Usage:
+  arradio [command]
+
+Available Commands:
+  top500             Get arradio-top500 radio stations
+  random             Get random list of radio stations
+  search  string     Search for radio stations by keyword
+  listen  id         Listen specified StationSHOUTCAST_API_ID
+  fadd    id         Add radio station to your favourites
+  fdel    id         Delete radio station from your favourites
+  flist              List favourites radio stations
+  help               Show this help information
+  version            Show version information
+  self-install       Install arradio itself
+  self-update        Update arradio itself
+
+Flags::
+  -l number          Limit the number of stations to search and display
+  -w                 Wide output format
+__HELP__
+  exit 0
+}
+
+arradio-check-deps() {
+  for dep in $@; do
+    # Search for the given executable in PATH (avoids a dependency on the `which` command)
+    if ! type -P $dep >/dev/null 2>&1; then
+      arradio-msg-error "Dependency '$dep' not found."
+    fi
+  done
+}
+
+arradio-filter-output-fzf() {
+  arradio-check-deps "cat" "xmllint" "fzf"
+  cat - \
+  | xmllint --xpath "//stationlist/station[@id]" - \
+  | fzf
+}
+
+arradio-filter-output() {
+  arradio-check-deps "cat" "xmllint" "grep" "sed"
   cat - \
   | xmllint --format - \
   | grep 'station name' \
@@ -51,7 +98,7 @@ outfilter() {
   | sed -e 's/\\n/\'$'\n/g' -e 's/\\t/\'$'\t/g' -e 's|\$||g' \
   | \
   (
-    if [[ $WIDE -eq 0 ]]; then
+    if [[ $ARRADIO_OUTPUT_WIDE -eq 0 ]]; then
       grep -ve 'MediaType:' -ve 'Bitrate' -ve 'Genre:'
     else
       cat -
@@ -59,75 +106,103 @@ outfilter() {
   )
 }
 
-checkDeps() {
-  for dep in xmllint curl; do
-    which $dep >/dev/null 2>&1
-   [[ $? -ne 0 ]] && "$dep binary not found"
-  done
-  # Check for player application
-  : ${found:=0}
-  for player in mpv mplayer vlc; do
-    which $player >/dev/null 2>&1
-    [[ $? -eq 0 ]] && found=1
-  done
-  [[ $found -eq 0 ]] && msgError "player application not found. mpv or mplayer or vlc is required"
-}
-
-getopts() {
+arradio-get-opts() {
   while [[ $1 ]]; do
     case $1 in
-      --limit|-l)
-        LIMIT=$2
-        shift
-        ;;
-      --wide|-w)
-        WIDE=1
-        ;;
+      --limit|-l) ARRADIO_OUTPUT_LIMIT=$2 && shift ;;
+      --wide|-w) ARRADIO_OUTPUT_WIDE=1 ;;
     esac
     shift
   done
 }
 
-# shoutcast api (new/legacy)
-# http://wiki.winamp.com/wiki/SHOUTcast_Radio_Directory_API
-top500() {
-  curl -s "${URL}Top500?k=${ID}&limit=${LIMIT}" | outfilter
+# =============================================================================
+# SELF
+# =============================================================================
+
+arradio-self-install() {
+  arradio-check-deps "mkdir" "curl" "chmod"
+  if [ -d ${ARRADIO_SRCDIR} ]; then
+    arradio-msg-error "arradio previously installed. Please remove it or run 'self update' command."
+  fi
+  arradio-msg-debug "Installing arradio to ${ARRADIO_HOME}"
+  mkdir -p ${ARRADIO_HOME} ${ARRADIO_BINDIR} ${ARRADIO_FAVDIR}
+  curl -fsSL ${ARRADIO_GITHUB_RAW} -o ${ARRADIO_BINDIR}/arradio && chmod +x ${ARRADIO_BINDIR}/arradio
+  arradio-msg-info "Installed successfully!"
+  arradio-msg-info "IMPORTANT: To finish do you need to add binaries to your PATH as for example:"
+  arradio-msg-info "  export PATH=\$HOME/.arradio/bin:\$PATH"
 }
-search() {
-  [ $# -lt 1 ] && msgUsage
+
+arradio-self-update() {
+  arradio-check-deps "curl"
+  if [ ! -d ${ARRADIO_BINDIR} ]; then
+    arradio-msg-error "Cannot update arradio. You need to install it first."
+  fi
+  arradio-msg-debug "Updating ${ARRADIO_SRCDIR}"
+  curl -fsSL ${ARRADIO_GITHUB_RAW} -o ${ARRADIO_BINDIR}/arradio && chmod +x ${ARRADIO_BINDIR}/arradio
+  arradio-msg-info "Updated successfully!"
+}
+
+# =============================================================================
+# SHOUTcast (see: http://wiki.winamp.com/wiki/SHOUTcast_Radio_Directory_API)
+# =============================================================================
+
+arradio-top500() {
+  arradio-check-deps "curl"
+  curl -s "${SHOUTCAST_API_URL}Top500?k=${SHOUTCAST_API_ID}&limit=${ARRADIO_OUTPUT_LIMIT}" | arradio-filter-output
+}
+
+arradio-search() {
+  arradio-check-deps "curl"
+  [ $# -lt 1 ] && arradio-print-help
   local string="$1"
-  curl -s "${URL}stationsearch?k=${ID}&search=${string}&limit=${LIMIT}" | outfilter
+  curl -s "${SHOUTCAST_API_URL}stationsearch?k=${SHOUTCAST_API_ID}&search=${string}&limit=${ARRADIO_OUTPUT_LIMIT}" | arradio-filter-output
 }
-random() {
-  curl -s "${URL2}randomstations?k=${ID}&f=xml&limit=${LIMIT}" | outfilter
+
+arradio-random() {
+  arradio-check-deps "curl"
+  curl -s "${SHOUTCAST_API_URL2}randomstations?k=${SHOUTCAST_API_ID}&f=xml&limit=${ARRADIO_OUTPUT_LIMIT}" | arradio-filter-output
 }
-listen() {
-  [ $# -lt 1 ] && msgUsage
+
+# =============================================================================
+# LISTEN
+# =============================================================================
+
+arradio-listen() {
+  arradio-check-deps "curl" "grep" "cut"
+  [ $# -lt 1 ] && arradio-print-help
   local id="$1"
-  curl -o $TMPFILE -s "http://yp.shoutcast.com/sbin/tunein-station.pls?id=${id}"
-  if ! grep -q 'numberofentries=0' $TMPFILE; then
-    $PLAYER $(grep 'File1' $TMPFILE | cut -d'=' -f2)
+  curl -o $ARRADIO_TMPFILE -s "http://yp.shoutcast.com/sbin/tunein-station.pls?id=${id}"
+  if ! grep -q 'numberofentries=0' $ARRADIO_TMPFILE; then
+    $PLAYER $(grep 'File1' $ARRADIO_TMPFILE | cut -d'=' -f2)
   fi
 }
 
-# operations with favourites
-fadd() {
-  [ $# -lt 1 ] && msgUsage
+# =============================================================================
+# FAVOURITES
+# =============================================================================
+
+arradio-fadd() {
+  arradio-check-deps "curl" "grep"
+  [ $# -lt 1 ] && arradio-print-help
   local id="$1"
-  [ ! -d $FAVDIR ] && mkdir -p $FAVDIR
-  curl -o $TMPFILE -s "http://yp.shoutcast.com/sbin/tunein-station.pls?id=${id}"
-  if ! grep -q 'numberofentries=0' $TMPFILE; then
-    cp -f $TMPFILE $FAVDIR/$id
+  [ ! -d $ARRADIO_FAVDIR ] && mkdir -p $ARRADIO_FAVDIR
+  curl -o $ARRADIO_TMPFILE -s "http://yp.shoutcast.com/sbin/tunein-station.pls?id=${id}"
+  if ! grep -q 'numberofentries=0' $ARRADIO_TMPFILE; then
+    cp -f $ARRADIO_TMPFILE $ARRADIO_FAVDIR/$id
   fi
 }
-fdel() {
-  [ $# -lt 1 ] && msgUsage
+
+arradio-fdel() {
+  [ $# -lt 1 ] && arradio-print-help
   local id="$1" 
-  rm -f $FAVDIR/$id
+  rm
+   -f $ARRADIO_FAVDIR/$id
 }
-flist() {
-  if [ -d $FAVDIR ]; then
-    for FAV in $FAVDIR/*; do
+arradio-flist() {
+  arradio-check-deps "grep" "cut" "sed"
+  if [ -d $ARRADIO_FAVDIR ]; then
+    for FAV in $ARRADIO_FAVDIR/*; do
       printf "%8d " "$(basename $FAV)"
       grep 'Title1=' $FAV | cut -d')' -f2 | sed 's/^ //'
     done
@@ -136,71 +211,58 @@ flist() {
 
 export LC_ALL=C
 
+readonly ARRADIO_VERSION="0.0.1"
+readonly ARRADIO_GITHUB_RAW="https://raw.githubusercontent.com/sepen/arradio/master/arradio"
+
+# Global variables
+export ARRADIO_NOCOLOR=${ARRADIO_NOCOLOR:-0}
+export ARRADIO_DEBUG=${ARRADIO_DEBUG:-0}
+export ARRADIO_HOME="${ARRADIO_HOME:-${HOME}/.arradio}"
+export ARRADIO_BINDIR="${ARRADIO_BINDIR:-${ARRADIO_HOME}/bin}"
+export ARRADIO_FAVDIR="${ARRADIO_FAVDIR:-${ARRADIO_HOME}/favorites}"
+export ARRADIO_TMPDIR="${ARRADIO_TMPDIR:-${ARRADIO_HOME}/tmp}"
+
 readonly PLAYER="mpv --no-video"
 #readonly PLAYER="mplayer -nocache"
 #readonly PLAYER="vlc"
 
-readonly TMPFILE=$(mktemp /tmp/$(basename $0).XXX)
-readonly FAVDIR="$HOME/.$(basename $0)/favorites"
+readonly ARRADIO_TMPFILE="${ARRADIO_TMPDIR}/cache"
 
-# TODO:
-# id for now from this source code (need to have own partner_id)
-# http://members.home.nl/djheemstra/MeediOS/MeeMedia_plugins/SHOUTcast%20Radio/SHOUTcast.cs
-readonly ID="sh17tOUi_ezL61_A"
+readonly SHOUTCAST_API_ID="sh17tOUi_ezL61_A"
+readonly SHOUTCAST_API_URL="http://api.shoutcast.com/legacy/"
+readonly SHOUTCAST_API_URL2="http://api.shoutcast.com/station/"
 
-readonly URL="http://api.shoutcast.com/legacy/"
-readonly URL2="http://api.shoutcast.com/station/"
+: ${ARRADIO_OUTPUT_LIMIT:=500} # required for arradio-top500
+: ${ARRADIO_OUTPUT_WIDE:=0} # required for wide output format
 
-: ${LIMIT:=500} # required for top500
-: ${WIDE:=0} # required for wide output format
+# We need at least one media player application
+: ${found:=0}
+for player in mpv mplayer vlc; do
+  arradio-check-deps $player >/dev/null 2>&1
+  [[ $? -eq 0 ]] && found=1 && break
+done
+[[ $found -eq 0 ]] && arradio-print-error "Media player application not found. VLC, Mplayer or mpv is required"
 
-checkDeps
+# Show help when no arguments given
+[ $# -eq 0 ] && arradio-print-help
 
-[ $# -eq 0 ] && msgUsage
-
-getopts $@
+arradio-get-opts $@
 
 while [ $1 ]; do
   case $1 in
-    top500)
-      top500
-      break
-      ;;
-    search)
-      shift 1
-      search $@
-      break
-      ;;
-    random)
-      random
-      break
-      ;;
-    listen)
-      shift 1
-      listen $1
-      break
-      ;;
-    fadd)
-      shift 1
-      fadd $1
-      break
-      ;;
-    fdel)
-      shift 1
-      fdel $1
-      break
-      ;;
-    flist)
-      flist
-      break
-      ;;
-    *)
-      msgUsage
-      ;;
+    arradio-top500) arradio-top500 ; break ;;
+    search) shift 1 ; arradio-search $@ ; break ;;
+    random) arradio-random ; break ;;
+    listen) shift 1 ; arradio-listen $1 ; break ;;
+    fadd) shift 1 ; arradio-fadd $1 ; break ;;
+    fdel) shift 1 ; arradio-fdel $1; break ;;
+    flist) arradio-flist ; break ;;
+    version) arradio-print-version ;;
+    self-install) arradio-self-install ;;
+    self-update) arradio-self-update ;;
+    *) arradio-print-help ;;
   esac
   shift
 done
-
-rm -f $TMPFILE
 
 # End of file
