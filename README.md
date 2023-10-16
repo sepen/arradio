@@ -39,7 +39,7 @@ Available Commands:
   top500             Get arradio-top500 radio stations
   random             Get random list of radio stations
   search  string     Search for radio stations by keyword
-  listen  id         Listen specified StationSHOUTCAST_API_ID
+  listen  id         Listen specified StationID
   fadd    id         Add radio station to your favourites
   fdel    id         Delete radio station from your favourites
   flist              List favourites radio stations

@@ -42,7 +42,7 @@ Available Commands:
   top500             Get arradio-top500 radio stations
   random             Get random list of radio stations
   search  string     Search for radio stations by keyword
-  listen  id         Listen specified StationSHOUTCAST_API_ID
+  listen  id         Listen specified StationID
   fadd    id         Add radio station to your favourites
   fdel    id         Delete radio station from your favourites
   flist              List favourites radio stations
@@ -119,7 +119,7 @@ arradio-self-install() {
     arradio-msg-error "arradio previously installed. Please remove it or run 'self-update' command."
   fi
   arradio-msg-debug "Installing arradio to ${ARRADIO_HOME}"
-  mkdir -p ${ARRADIO_HOME} ${ARRADIO_BINDIR} ${ARRADIO_FAVDIR}
+  mkdir -p ${ARRADIO_HOME} ${ARRADIO_BINDIR} ${ARRADIO_FAVDIR} ${ARRADIO_TMPDIR}
   curl -fsSL ${ARRADIO_GITHUB_RAW} -o ${ARRADIO_BINDIR}/arradio && chmod +x ${ARRADIO_BINDIR}/arradio
   arradio-msg-info "Installed successfully!"
   arradio-msg-info "IMPORTANT: To finish do you need to add binaries to your PATH as for example:"
