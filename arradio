@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-#
-# arradio: SHOUTcast command line client
-#
-# Dependencies:
-#   xmllint and curl binaries are required
-#   mpv or mplayer or vlc is required to play streaming urls
-
 
 # =============================================================================
 # HELPER FUNCTIONS
