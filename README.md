@@ -2,15 +2,15 @@
 
 # `arradio`
 
-Listen to radio stations from the terminal.\
+Listen to internet radio stations from the terminal.
 
 ![Last Commit](https://img.shields.io/github/last-commit/sepen/k8kreator)
 ![Repo Size](https://img.shields.io/github/repo-size/sepen/k8kreator)
 ![Code Size](https://img.shields.io/github/languages/code-size/sepen/k8kreator)
 ![Proudly Written in Bash](https://img.shields.io/badge/written%20in-bash-ff69b4)
 
-The main utility of _arradio_ is to search for radio stations in the ShoutCAST directory, save the favorite radio stations for later and avoid manual link management to the streaming url for every time you want to listen to a radio station.\
-\
+The main utility of _arradio_ is to search for radio stations in the ShoutCAST directory, save the favorite radio stations for later and avoid manual link management to the streaming url for every time you want to listen to a radio station.
+
 This program does not play streams directly, this is delegated to _mpv_, _mplayer_ or _vlc_ program, so one of these programs must be previously installed.
 
 ![demo](demo/arradio.gif)
