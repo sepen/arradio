@@ -59,10 +59,11 @@ __HELP__
 }
 
 arradio-check-deps() {
+  local exit=${1:-0}
   for dep in $@; do
     # Search for the given executable in PATH (avoids a dependency on the `which` command)
     if ! type -P $dep >/dev/null 2>&1; then
-      arradio-msg-error "Dependency '$dep' not found."
+      [[ $exit -eq 1 ]] && arradio-msg-error "Dependency '$dep' not found."
     fi
   done
 }
@@ -167,7 +168,8 @@ arradio-listen() {
   local id="$1"
   curl -o $ARRADIO_TMPFILE -s "http://yp.shoutcast.com/sbin/tunein-station.pls?id=${id}"
   if ! grep -q 'numberofentries=0' $ARRADIO_TMPFILE; then
-    $PLAYER $(grep 'File1' $ARRADIO_TMPFILE | cut -d'=' -f2)
+    arradio-msg-info "Playing $(grep 'Title1' $ARRADIO_TMPFILE | cut -d'=' -f2)"
+    $ARRADIO_PLAYER $(grep 'File1' $ARRADIO_TMPFILE | cut -d'=' -f2)
   fi
 }
 
@@ -215,10 +217,6 @@ export ARRADIO_BINDIR="${ARRADIO_BINDIR:-${ARRADIO_HOME}/bin}"
 export ARRADIO_FAVDIR="${ARRADIO_FAVDIR:-${ARRADIO_HOME}/favorites}"
 export ARRADIO_TMPDIR="${ARRADIO_TMPDIR:-${ARRADIO_HOME}/tmp}"
 
-readonly PLAYER="mpv --no-video"
-#readonly PLAYER="mplayer -nocache"
-#readonly PLAYER="vlc"
-
 readonly ARRADIO_TMPFILE="${ARRADIO_TMPDIR}/cache"
 
 readonly SHOUTCAST_API_ID="sh17tOUi_ezL61_A"
@@ -228,13 +226,30 @@ readonly SHOUTCAST_API_URL2="http://api.shoutcast.com/station/"
 : ${ARRADIO_OUTPUT_LIMIT:=500} # required for arradio-top500
 : ${ARRADIO_OUTPUT_WIDE:=0} # required for wide output format
 
+export PATH=$ARRADIO_BINDIR:$PATH
+
+export ARRADIO_PLAYER=${ARRADIO_PLAYER:-arradio-player}
 # We need at least one media player application
-: ${found:=0}
-for player in mpv mplayer vlc; do
-  arradio-check-deps $player >/dev/null 2>&1
-  [[ $? -eq 0 ]] && found=1 && break
-done
-[[ $found -eq 0 ]] && arradio-print-error "Media player application not found. VLC, Mplayer or mpv is required"
+if ! arradio-check-deps $ARRADIO_PLAYER >/dev/null 2>&1; then
+  arradio-msg-info "Default media player \`arradio-player\` is not installed. It is not necessary, but recommended. Please visit: https://github.com/sepen/arradio-player"
+  arradio-msg-info "Looking for an alternate media player application"
+  : ${found:=0}
+  for player in mpv mplayer vlc; do
+    if arradio-check-deps $player >/dev/null 2>&1; then
+      found=1
+      case $player in
+        mpv) ARRADIO_PLAYER="mpv --no-video" ;;
+        mplayer) ARRADIO_PLAYER="mplayer -nocache" ;;
+        vlc) ARRADIO_PLAYER="vlc" ;;
+      esac
+      arradio-msg-info "Using command \`$ARRADIO_PLAYER\` for playing radio station"
+      break
+    fi
+  done
+  if [ $found -eq 0 ]; then
+    arradio-print-error "Media player application not found. VLC, Mplayer, mpv or arradio-player is required"
+  fi
+fi
 
 # Show help when no arguments given
 [ $# -eq 0 ] && arradio-print-help
