@@ -56,6 +56,7 @@ Flags::
   -l number          Limit output lines. Default: ${ARRADIO_OUTPUT_LIMIT}
   -o format          Output list format (simple or wide). Default: ${ARRADIO_OUTPUT_FILTER}
   -t theme           UI theme: basic, molokai, gruvbox, nord, light, or dark. Default: ${ARRADIO_UI_THEME}
+  -p command         Command to play the streams. Default: ${ARRADIO_PLAYER_CMD}
 __HELP__
   exit 0
 }
@@ -71,17 +72,22 @@ arradio-check-deps() {
 
 arradio-set-player() {
   # We need at least one media player application
-  # Otherwise we will use the default one `arradio-player`
-  local arradio_player_cmd="arradio-player"
-  # Detection will be in order of preference
-  if type -P mpv >/dev/null 2>&1; then
-    arradio_player_cmd="mpv --no-video"
-  elif type -P mplayer >/dev/null 2>&1; then
-    arradio_player_cmd="mplayer -vo null"
-  elif type -P ffplay >/dev/null 2>&1; then
-    arradio_player_cmd="ffplay -vn"
-  elif type -P cvlc >/dev/null 2>&1; then
-    arradio_player_cmd="cvlc --novideo"
+  # Otherwise we will use the default one
+  local arradio_player_cmd="${ARRADIO_PLAYER_CMD}"
+  # When the player is forced it also avoids having to detect it
+  if [ ! -z "${ARRADIO_FORCE_PLAYER_CMD}" ]; then
+    arradio_player_cmd="${ARRADIO_FORCE_PLAYER_CMD}"
+  else
+    # Detection will be in order of preference
+    if type -P mpv >/dev/null 2>&1; then
+      arradio_player_cmd="mpv --no-video"
+    elif type -P ffplay >/dev/null 2>&1; then
+      arradio_player_cmd="ffplay -vn"
+    elif type -P mplayer >/dev/null 2>&1; then
+      arradio_player_cmd="mplayer -vo null"
+    elif type -P cvlc >/dev/null 2>&1; then
+      arradio_player_cmd="cvlc --novideo"
+    fi
   fi
   export ARRADIO_PLAYER_CMD=${arradio_player_cmd}
 }
@@ -163,6 +169,7 @@ arradio-get-opts() {
       --limit|-l) ARRADIO_OUTPUT_LIMIT=$2 && shift ;;
       --output|-o) ARRADIO_OUTPUT_FILTER=$2 && shift ;;
       --theme|-t) ARRADIO_UI_THEME=$2 && shift ;;
+      --player|-p) ARRADIO_FORCE_PLAYER_CMD=$2 && shift ;;
     esac
     shift
   done
@@ -344,6 +351,7 @@ export ARRADIO_OUTPUT_LIMIT=${ARRADIO_OUTPUT_LIMIT:-500}
 export ARRADIO_OUTPUT_FILTER="${ARRADIO_OUTPUT_FILTER:-wide}"
 export ARRADIO_UI_THEME="${ARRADIO_UI_THEME:-basic}"
 export ARRADIO_PLAYER_CMD="arradio-player"
+export ARRADIO_FORCE_PLAYER_CMD="${ARRADIO_FORCE_PLAYER_CMD}"
 
 # SHOUTcast
 readonly SHOUTCAST_API_ID="sh17tOUi_ezL61_A"
