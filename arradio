@@ -53,9 +53,9 @@ Available Commands:
   update             Update arradio itself
 
 Flags::
-  -l number          Limit output lines (default: ${ARRADIO_OUTPUT_LIMIT})
-  -o format          Output list format (simple or wide, default: ${ARRADIO_OUTPUT_FILTER})
-  -t theme           Set UI theme (molokai, gruvbox, nordvim, purple, light, or dark)
+  -l number          Limit output lines. Default: ${ARRADIO_OUTPUT_LIMIT}
+  -o format          Output list format (simple or wide). Default: ${ARRADIO_OUTPUT_FILTER}
+  -t theme           UI theme: basic, molokai, gruvbox, nord, light, or dark. Default: ${ARRADIO_UI_THEME}
 __HELP__
   exit 0
 }
@@ -293,9 +293,14 @@ arradio-ui-set-theme() {
       # tomasr/molokai
       export FZF_DEFAULT_OPTS='--color=bg+:#293739,bg:#1B1D1E,border:#808080,spinner:#E6DB74,hl:#7E8E91,fg:#F8F8F2,header:#7E8E91,info:#A6E22E,pointer:#A6E22E,marker:#F92672,fg+:#F8F8F2,prompt:#F92672,hl+:#F92672'
       ;;
-    purple)
-      # purple
-      export FZF_DEFAULT_OPTS='--color=bg+:#E0E0D9,bg:#E0E0E1,border:#7E1E91,spinner:#928374,hl:#7E1E91,fg:#515151,header:#7E1E91,info:#8ec07c,pointer:#81A1C1,marker:#192672,fg+:#515151,prompt:#fb4934,hl+:#192672'
+    basic)
+      # basic
+      export FZF_DEFAULT_OPTS='--color=bg+:#282828,bg:#000000,border:#C1C1C1,spinner:#696EF1,hl:#000000,fg:#919191,header:#444444,info:#919191,pointer:#696EF1,marker:#696EF1,fg+:#FFFFFF,prompt:#696EF1,hl+:#878787,preview-fg:#3F3F3F'
+      ;;
+    *)
+      # no theme selected
+      arradio-msg-info "UI theme not supported: \`${ARRADIO_UI_THEME}\`"
+      arradio-print-help
       ;;
   esac
 }
@@ -337,7 +342,7 @@ export ARRADIO_TMPDIR="${ARRADIO_TMPDIR:-${ARRADIO_HOME}/tmp}"
 export ARRADIO_TMPFILE="${ARRADIO_TMPDIR}/station"
 export ARRADIO_OUTPUT_LIMIT=${ARRADIO_OUTPUT_LIMIT:-500}
 export ARRADIO_OUTPUT_FILTER="${ARRADIO_OUTPUT_FILTER:-wide}"
-export ARRADIO_UI_THEME="${ARRADIO_UI_THEME:-none}"
+export ARRADIO_UI_THEME="${ARRADIO_UI_THEME:-basic}"
 export ARRADIO_PLAYER_CMD="arradio-player"
 
 # SHOUTcast
