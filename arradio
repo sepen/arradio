@@ -55,7 +55,7 @@ Available Commands:
 Flags::
   -l number          Limit output lines. Default: ${ARRADIO_OUTPUT_LIMIT}
   -o format          Output list format (simple or wide). Default: ${ARRADIO_OUTPUT_FILTER}
-  -t theme           UI theme: basic, molokai, gruvbox, nord, light, or dark. Default: ${ARRADIO_UI_THEME}
+  -t theme           UI theme (basic, molokai, gruvbox, nord, light, or dark). Default: ${ARRADIO_UI_THEME}
   -p command         Command to play the streams. Default: ${ARRADIO_PLAYER_CMD}
 __HELP__
   exit 0
@@ -136,28 +136,33 @@ arradio-get-station-url-by-id() {
 }
 
 arradio-filter-output() {
-  arradio-check-deps "cat" "xmllint" "grep" "sed"
+  arradio-check-deps "cat" "xmllint" "grep" "sed" "head"
   case ${ARRADIO_OUTPUT_FILTER} in
     simple)
-      printf "%8s %s\n" "STATION" "DESCRIPTION"
+      printf "%8s %-18s %s\n" "STATION" "GENRE" "NAME"
       ;;
     wide)
-      printf "%8s %-20s %s\n" "STATION" "GENRE" "DESCRIPTION"
+      printf "%8s %-18s %-36s %s\n" "STATION" "GENRE" "NAME" "COMMENTS"
       ;;
   esac
   cat - \
   | xmllint --format - \
   | grep 'station name' \
+  | sed -e 's|\&amp;|\&|g' \
+  | sed -e 's/\\n/\'$'\n/g' -e 's/\\t/\'$'\t/g' -e 's|\$||g' \
   | while read line; do
       id=$(echo $line | sed -e 's|.* id="||' -e 's|" .*||')
+      bitrate=$(echo $line | sed -e 's|.* br="||' -e 's|" .*||')
       name=$(echo $line | sed -e 's|.* name="||' -e 's|" .*||')
-      genre=$(echo $line | sed -e 's|.* genre="||' -e 's|" .*||')
+      genre=$(echo $line | sed -e 's|.* genre="||' -e 's|" .*||' | head -c 18)
+      comments=$(echo $line | sed -e 's|.* ct="||' -e 's|" .*||')
       case ${ARRADIO_OUTPUT_FILTER} in
         simple)
-          printf "%8s %s\n" "$id" "$name"
+          printf "%8s %-18s %s\n" "${id}" "${genre}" "${name}"
           ;;
         wide)
-          printf "%8s %-20s %s\n" "$id" "$genre" "$name"
+          name=$(echo ${name} | head -c 36)
+          printf "%8s %-18s %-36s %s\n" "${id}" "${genre}" "${name}" "${comments}"
           ;;
       esac
     done
@@ -348,7 +353,7 @@ export ARRADIO_FAVDIR="${ARRADIO_FAVDIR:-${ARRADIO_HOME}/favorites}"
 export ARRADIO_TMPDIR="${ARRADIO_TMPDIR:-${ARRADIO_HOME}/tmp}"
 export ARRADIO_TMPFILE="${ARRADIO_TMPDIR}/station"
 export ARRADIO_OUTPUT_LIMIT=${ARRADIO_OUTPUT_LIMIT:-500}
-export ARRADIO_OUTPUT_FILTER="${ARRADIO_OUTPUT_FILTER:-wide}"
+export ARRADIO_OUTPUT_FILTER="${ARRADIO_OUTPUT_FILTER:-simple}"
 export ARRADIO_UI_THEME="${ARRADIO_UI_THEME:-basic}"
 export ARRADIO_PLAYER_CMD="arradio-player"
 export ARRADIO_FORCE_PLAYER_CMD="${ARRADIO_FORCE_PLAYER_CMD}"
