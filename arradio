@@ -71,6 +71,16 @@ arradio-check-deps() {
   done
 }
 
+arradio-get-md5-command(){
+  if type -P md5sum >/dev/null 2>&1; then
+    echo "md5sum"
+  elif type -P md5 >/dev/null 2>&1; then
+    echo "md5"
+  else
+    arradio-msg-error "md5sum or md5 command is required"
+  fi
+}
+
 arradio-set-player() {
   # We need at least one media player application
   # Otherwise we will use the default one
@@ -106,18 +116,20 @@ arradio-get-fzf-version() {
 }
 
 arradio-make-api-request()  {
-  arradio-check-deps "base64" "curl" "xmllint"
+  arradio-check-deps "cut" "curl" "xmllint"
+  local md5_command="$(arradio-get-md5-command)"
   [ $# -lt 1 ] && arradio-print-help
   local request_url="$1"
-  local cache_name="$(echo ${request_url} | base64)"
+  local cache_name="$(echo "${request_url}" | ${md5_command} | cut -d' ' -f1)"
   local cache_file="${ARRADIO_CACHEDIR}/${cache_name}"
   # store the response to cache
   if [ ${ARRADIO_NOCACHE} -eq 1 ] || [ ! -f "${cache_file}" ]; then
     arradio-msg-debug "Caching file for request url ${request_url}"
-    curl -s "${request_url}" | xmllint --format - > ${cache_file}
+    curl -s "${request_url}" -o ${ARRADIO_TMPFILE}
+    xmllint --format ${ARRADIO_TMPFILE} --output "${cache_file}"
   fi
   # output from cache
-  cat ${cache_file}
+  cat "${cache_file}"
 }
 
 arradio-get-station-url() {
