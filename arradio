@@ -39,24 +39,25 @@ Usage:
   arradio [command]
 
 Available Commands:
-  top500             Get arradio-top500 radio stations
-  random             Get random list of radio stations
+  top500             Get top 500 radio stations
   search  string     Search for radio stations by keyword
   listen  id         Listen to specified radio station
   fadd    id         Add radio station to your favourites
   fdel    id         Delete radio station from your favourites
   flist              List favourites radio stations
-  ui                 Start user interface mode
+  ui                 Start arradio in User Interface mode
   help               Show this help information
   version            Show version information
   install            Install arradio itself
   update             Update arradio itself
 
 Flags::
-  -l number          Limit output lines. Default: ${ARRADIO_OUTPUT_LIMIT}
-  -o format          Output list format (simple or wide). Default: ${ARRADIO_OUTPUT_FILTER}
-  -t theme           UI theme (basic, molokai, gruvbox, nord, light, or dark). Default: ${ARRADIO_UI_THEME}
-  -p command         Command to play the streams. Default: ${ARRADIO_PLAYER_CMD}
+  -l number          Limit output lines. Default: $ARRADIO_OUTPUT_LIMIT
+  -o format          Output list format (simple or wide). Default: $ARRADIO_OUTPUT_FILTER
+  -t theme           UI theme (basic, molokai, gruvbox, nord, light, or dark). Default: $ARRADIO_UI_THEME
+  -p command         Command to play the streams. Default: $ARRADIO_PLAYER_CMD
+  -n                 Make requests every time before using a cached resource
+  -d                 Enable debug messages
 __HELP__
   exit 0
 }
@@ -104,65 +105,87 @@ arradio-get-fzf-version() {
   fi
 }
 
-arradio-get-station-url-by-id() {
-  arradio-check-deps "cp" "curl" "sed" "grep" "cut"
+arradio-make-api-request()  {
+  arradio-check-deps "md5sum" "curl" "xmllint"
   [ $# -lt 1 ] && arradio-print-help
-  local id="$1"
-  local stream_url=""
-  case ${id} in
-    000*)
-      # get the stream URL directly from favorites file
-      stream_url=$(grep 'File1' ${ARRADIO_FAVDIR}/${id} | cut -d'=' -f2)
-      ;;
-    *)
-      # first check against tunein-station.pls
-      if curl -I --fail -s "http://yp.shoutcast.com/sbin/tunein-station.pls?id=${id}" >/dev/null 2>&1; then
-        # use a temporary file to get the stream URL
-        curl -o ${ARRADIO_TMPFILE} -s "http://yp.shoutcast.com/sbin/tunein-station.pls?id=${id}"
-        if ! grep -q 'numberofentries=0' ${ARRADIO_TMPFILE}; then
-          stream_url=$(grep 'File1' ${ARRADIO_TMPFILE} | cut -d'=' -f2)
-        fi
-        # if station exists then still check if streamUrl is operational
-        # - tunein-stations.pls returns the streamUrl for some stations even they are broken
-        # - randomstations uses a different API to get the stream URL
-        if ! curl -I --fail -s "${stream_url}" >/dev/null 2>&1; then
-          # remove quotes from response
-          stream_url=$(curl -X POST -d "station=${id}" -s 'https://directory.shoutcast.com/Player/GetStreamUrl' | sed -e 's/^"//' -e 's/"$//')
-        fi
-      fi
-      ;;
-  esac
-  echo ${stream_url}
+  local request_url="$1"
+  local cache_name="$(echo ${request_url} | md5sum | cut -d' ' -f1)"
+  local cache_file="${ARRADIO_CACHEDIR}/${cache_name}"
+  # store the response to cache
+  if [ ${ARRADIO_NOCACHE} -eq 1 ] || [ ! -f "${cache_file}" ]; then
+    arradio-msg-debug "Caching file for request url ${request_url}"
+    curl -s "${request_url}" | xmllint --format - > ${cache_file}
+  fi
+  # output from cache
+  cat ${cache_file}
 }
 
-arradio-filter-output() {
+arradio-get-station-url() {
+  arradio-check-deps "grep" "sed" "curl" "grep"
+  [ $# -lt 1 ] && arradio-print-help
+  local station_id="$1"
+  # first check if we can get the station_url from the db_file
+  local db_file="${ARRADIO_DBDIR}/${station_id}"
+  if [ -f ${db_file} ]; then
+    local station_url="$(grep '^url: ' ${db_file} 2>/dev/null | sed 's|url: ||')"
+    # make a request if we can't get the station_url from the db_file
+    if [ -z ${station_url} ]; then
+      station_url=$(curl -X POST -d "station=${station_id}" -s 'https://directory.shoutcast.com/Player/GetStreamUrl' | sed -e 's/^"//' -e 's/"$//')
+      # update station_url in the db_file
+      grep -v '^url: ' ${db_file} > ${ARRADIO_TMPFILE}
+      echo "url: ${station_url}" >> ${ARRADIO_TMPFILE}
+      cp ${ARRADIO_TMPFILE} ${db_file}
+    fi
+    echo ${station_url}
+  fi
+}
+
+arradio-output-filter() {
   arradio-check-deps "cat" "xmllint" "grep" "sed" "head"
   case ${ARRADIO_OUTPUT_FILTER} in
     simple)
-      printf "%8s %-18s %s\n" "STATION" "GENRE" "NAME"
+      printf "%8s  %-18s  %s\n" "STATION" "GENRE" "NAME"
       ;;
     wide)
-      printf "%8s %-18s %-36s %s\n" "STATION" "GENRE" "NAME" "COMMENTS"
+      printf "%8s  %-18s  %-38s  %s\n" "STATION" "GENRE" "NAME" "INFO"
       ;;
   esac
   cat - \
-  | xmllint --format - \
   | grep 'station name' \
-  | sed -e 's|\&amp;|\&|g' \
-  | sed -e 's/\\n/\'$'\n/g' -e 's/\\t/\'$'\t/g' -e 's|\$||g' \
-  | while read line; do
-      id=$(echo $line | sed -e 's|.* id="||' -e 's|" .*||')
-      bitrate=$(echo $line | sed -e 's|.* br="||' -e 's|" .*||')
-      name=$(echo $line | sed -e 's|.* name="||' -e 's|" .*||')
-      genre=$(echo $line | sed -e 's|.* genre="||' -e 's|" .*||' | head -c 18)
-      comments=$(echo $line | sed -e 's|.* ct="||' -e 's|" .*||')
+  | while read xml_line; do
+      station_id="$(echo ${xml_line} | sed -e 's|.* id="||' -e 's|" .*||')"
+      db_file="${ARRADIO_DBDIR}/${station_id}"
+      if [ ${ARRADIO_NOCACHE} -eq 1 ] || [ ! -f "${db_file}" ]; then
+        arradio-msg-debug "Updating db file for station: ${station_id}"
+        echo ${xml_line} | sed \
+          -e 's|.*<station name="|name: |' \
+          -e 's|" mt="|\nmt: |' \
+          -e 's|" id="|\nid: |' \
+          -e 's|" br="|\nbr: |' \
+          -e 's|" genre="|\ngenre: |' \
+          -e 's|" genre2="|\ngenre2: |' \
+          -e 's|" genre3="|\ngenre3: |' \
+          -e 's|" genre4="|\ngenre4: |' \
+          -e 's|" logo="|\nlogo: |' \
+          -e 's|" ct="|\ninfo: |' \
+          -e 's|" lc="|\nlc: |' \
+          -e 's|"\/>|\n|' \
+          -e 's|\&quot;|"|g' \
+          -e 's|\&nbsp;| |g' \
+          -e 's|\&lt;|<|g' \
+          -e 's|\&gt;|>|g' \
+          -e 's|\&amp;|\&|g' > ${db_file}
+      fi
+      station_genre="$(grep '^genre: ' ${db_file} 2>/dev/null | sed 's|genre: ||')"
+      station_name="$(grep '^name: ' ${db_file} 2>/dev/null | sed 's|name: ||')"
+      station_info="$(grep '^info: ' ${db_file} 2>/dev/null | sed 's|info: ||')"
       case ${ARRADIO_OUTPUT_FILTER} in
         simple)
-          printf "%8s %-18s %s\n" "${id}" "${genre}" "${name}"
+          printf "%8s  %-18s  %s\n" "${station_id}" "${station_genre}" "${station_name:-'NO NAME'}"
           ;;
         wide)
-          name=$(echo ${name} | head -c 36)
-          printf "%8s %-18s %-36s %s\n" "${id}" "${genre}" "${name}" "${comments}"
+          station_name=$(echo ${station_name} | head -c 38)
+          printf "%8s  %-18s  %-38s  %s\n" "${station_id}" "${station_genre}" "${station_name:-'NO NAME'}" "${station_info}"
           ;;
       esac
     done
@@ -175,6 +198,8 @@ arradio-get-opts() {
       --output|-o) ARRADIO_OUTPUT_FILTER=$2 && shift ;;
       --theme|-t) ARRADIO_UI_THEME=$2 && shift ;;
       --player|-p) ARRADIO_FORCE_PLAYER_CMD=$2 && shift ;;
+      --nocache|-n) ARRADIO_NOCACHE=1 ;;
+      --debug|-d) ARRADIO_DEBUG=1 ;;
     esac
     shift
   done
@@ -190,7 +215,7 @@ arradio-install() {
     arradio-msg-error "arradio previously installed. Please remove it or run 'update' command."
   fi
   arradio-msg-debug "Installing arradio to ${ARRADIO_HOME}"
-  mkdir -p ${ARRADIO_HOME} ${ARRADIO_BINDIR} ${ARRADIO_FAVDIR} ${ARRADIO_TMPDIR}
+  mkdir -p ${ARRADIO_HOME} ${ARRADIO_BINDIR} ${ARRADIO_DBDIR} ${ARRADIO_CACHEDIR} ${ARRADIO_FAVDIR} ${ARRADIO_TMPDIR}
   curl -fsSL ${ARRADIO_GITHUB_RAW} -o ${ARRADIO_BINDIR}/arradio
   chmod +x ${ARRADIO_BINDIR}/arradio
   arradio-msg-info "Installed successfully!"
@@ -213,23 +238,14 @@ arradio-update() {
 # =============================================================================
 
 arradio-top500() {
-  arradio-check-deps "curl"
-  curl -s "${SHOUTCAST_API_URL}Top500?k=${SHOUTCAST_API_ID}&limit=${ARRADIO_OUTPUT_LIMIT}" \
-  | arradio-filter-output
+  arradio-make-api-request "${SHOUTCAST_API_URL}Top500?k=${SHOUTCAST_API_ID}&limit=${ARRADIO_OUTPUT_LIMIT}" \
+  | arradio-output-filter
 }
 
 arradio-search() {
-  arradio-check-deps "curl"
   [ $# -lt 1 ] && arradio-print-help
-  local string="$1"
-  curl -s "${SHOUTCAST_API_URL}stationsearch?k=${SHOUTCAST_API_ID}&search=${string}&limit=${ARRADIO_OUTPUT_LIMIT}" \
-  | arradio-filter-output
-}
-
-arradio-random() {
-  arradio-check-deps "curl"
-  curl -s "${SHOUTCAST_API_URL2}randomstations?k=${SHOUTCAST_API_ID}&f=xml&limit=${ARRADIO_OUTPUT_LIMIT}" \
-  | arradio-filter-output
+  arradio-make-api-request "${SHOUTCAST_API_URL}stationsearch?search=$1&k=${SHOUTCAST_API_ID}&limit=${ARRADIO_OUTPUT_LIMIT}" \
+  | arradio-output-filter
 }
 
 # =============================================================================
@@ -237,14 +253,14 @@ arradio-random() {
 # =============================================================================
 
 arradio-listen() {
-  local id=$1
-  local stream_url=$(arradio-get-station-url-by-id $id)
-  if [ -z ${stream_url} ]; then
-    arradio-msg-error "stream URL not found for station ${id}"
+  local station_id="$1"
+  local station_url="$(arradio-get-station-url $station_id)"
+  if [ -z ${station_url} ]; then
+    arradio-msg-error "station_url not found for station_id ${station_id}"
   fi
   arradio-set-player
-  arradio-msg-info "${ARRADIO_PLAYER_CMD} '${stream_url}'"
-  ${ARRADIO_PLAYER_CMD} ${stream_url}
+  arradio-msg-info "${ARRADIO_PLAYER_CMD} ${station_url}"
+  ${ARRADIO_PLAYER_CMD} ${station_url}
 }
 
 # =============================================================================
@@ -252,29 +268,47 @@ arradio-listen() {
 # =============================================================================
 
 arradio-fadd() {
-  arradio-check-deps "mkdir" "curl" "grep"
+  arradio-check-deps "cp"
   [ $# -lt 1 ] && arradio-print-help
-  local id="$1"
-  [ ! -d ${ARRADIO_FAVDIR} ] && mkdir -p $ARRADIO_FAVDIR
-  curl -o ${ARRADIO_TMPFILE} -s "http://yp.shoutcast.com/sbin/tunein-station.pls?id=${id}"
-  if ! grep -q 'numberofentries=0' ${ARRADIO_TMPFILE}; then
-    cp -f ${ARRADIO_TMPFILE} ${ARRADIO_FAVDIR}/${id}
+  local station_id="$1"
+  local db_file="${ARRADIO_DBDIR}/${station_id}"
+  if [ -f ${db_file} ]; then
+    cp ${db_file} ${ARRADIO_FAVDIR}/${station_id}
   fi
 }
 
 arradio-fdel() {
+  arradio-check-deps "rm"
   [ $# -lt 1 ] && arradio-print-help
-  local id="$1"
-  rm -f ${ARRADIO_FAVDIR}/${id}
+  local station_id="$1"
+  rm ${ARRADIO_FAVDIR}/${station_id}
 }
 
 arradio-flist() {
   arradio-check-deps "basename" "grep" "sed"
   if [ -d ${ARRADIO_FAVDIR} ]; then
-    printf "%8s %s\n" "STATION" "DESCRIPTION"
-    for fav in ${ARRADIO_FAVDIR}/*; do
-      printf "%8s " "$(basename ${fav})"
-      grep 'Title1=' ${fav} | sed -e 's|Title1=||' -e 's/.*) //'
+    case ${ARRADIO_OUTPUT_FILTER} in
+      simple)
+        printf "%8s  %-18s  %s\n" "STATION" "GENRE" "NAME"
+        ;;
+      wide)
+        printf "%8s  %-18s  %-38s  %s\n" "STATION" "GENRE" "NAME" "INFO"
+        ;;
+    esac
+    for fav_file in ${ARRADIO_FAVDIR}/*; do
+      station_id="$(grep '^id:' ${fav_file} 2>/dev/null | sed 's|id: ||')"
+      station_genre="$(grep '^genre: ' ${fav_file} 2>/dev/null | sed 's|genre: ||')"
+      station_name="$(grep '^name: ' ${fav_file} 2>/dev/null | sed 's|name: ||')"
+      station_info="$(grep '^info: ' ${fav_file} 2>/dev/null | sed 's|info: ||')"
+      case ${ARRADIO_OUTPUT_FILTER} in
+        simple)
+          printf "%8s  %-18s  %s\n" "${station_id}" "${station_genre}" "${station_name}"
+          ;;
+        wide)
+          station_name=$(echo ${station_name} | head -c 38)
+          printf "%8s  %-18s  %-38s  %s\n" "${station_id}" "${station_genre}" "${station_name}" "${station_info}"
+          ;;
+      esac
     done
   fi
 }
@@ -328,12 +362,11 @@ arradio-ui() {
     --prompt "Favorites> " \
     --preview 'arradio listen {1}' \
     --preview-window 'down,40%,border,follow' \
-    --header $'\nCTRL-F Favorites | CTRL-T Top500 | CTRL-R Random | +,- Add or remove\n\n' \
+    --header $'\nCTRL-F Favorites | CTRL-T Top500 | +/- Favorites add/remove\n\n' \
     --bind 'start:reload(arradio flist)' \
     --bind 'enter:change-preview-window(up|down)' \
     --bind 'ctrl-f:change-prompt(Favorites> )+reload(arradio flist)' \
     --bind 'ctrl-t:change-prompt(Top500> )+reload(arradio top500)' \
-    --bind 'ctrl-r:change-prompt(Random> )+reload(arradio random)' \
     --bind '+:change-prompt(Favorites> )+reload(arradio fadd {1}; arradio flist)' \
     --bind '-:change-prompt(Favorites> )+reload(arradio fdel {1}; arradio flist)'
 }
@@ -349,19 +382,23 @@ export ARRADIO_NOCOLOR=${ARRADIO_NOCOLOR:-0}
 export ARRADIO_DEBUG=${ARRADIO_DEBUG:-0}
 export ARRADIO_HOME="${ARRADIO_HOME:-${HOME}/.arradio}"
 export ARRADIO_BINDIR="${ARRADIO_BINDIR:-${ARRADIO_HOME}/bin}"
+export ARRADIO_DBDIR="${ARRADIO_DBDIR:-${ARRADIO_HOME}/db}"
+export ARRADIO_CACHEDIR="${ARRADIO_CACHEDIR:-${ARRADIO_HOME}/cache}"
 export ARRADIO_FAVDIR="${ARRADIO_FAVDIR:-${ARRADIO_HOME}/favorites}"
 export ARRADIO_TMPDIR="${ARRADIO_TMPDIR:-${ARRADIO_HOME}/tmp}"
 export ARRADIO_TMPFILE="${ARRADIO_TMPDIR}/station"
-export ARRADIO_OUTPUT_LIMIT=${ARRADIO_OUTPUT_LIMIT:-500}
+
+# Global flags
+export ARRADIO_OUTPUT_LIMIT=${ARRADIO_OUTPUT_LIMIT:-20} # from 1 to 500
 export ARRADIO_OUTPUT_FILTER="${ARRADIO_OUTPUT_FILTER:-simple}"
 export ARRADIO_UI_THEME="${ARRADIO_UI_THEME:-basic}"
 export ARRADIO_PLAYER_CMD="arradio-player"
 export ARRADIO_FORCE_PLAYER_CMD="${ARRADIO_FORCE_PLAYER_CMD}"
+export ARRADIO_NOCACHE=${ARRADIO_NOCACHE:-0}
 
 # SHOUTcast
 readonly SHOUTCAST_API_ID="sh17tOUi_ezL61_A"
 readonly SHOUTCAST_API_URL="http://api.shoutcast.com/legacy/"
-readonly SHOUTCAST_API_URL2="http://api.shoutcast.com/station/"
 
 # Show help when no arguments given
 [ $# -eq 0 ] && arradio-print-help
@@ -372,7 +409,6 @@ while [ $1 ]; do
   case $1 in
     top500) arradio-top500 ; break ;;
     search) shift 1 ; arradio-search $@ ; break ;;
-    random) arradio-random ; break ;;
     listen) shift 1 ; arradio-listen $1 ; break ;;
     fadd) shift 1 ; arradio-fadd $1 ; break ;;
     fdel) shift 1 ; arradio-fdel $1; break ;;
