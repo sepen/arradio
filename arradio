@@ -106,10 +106,10 @@ arradio-get-fzf-version() {
 }
 
 arradio-make-api-request()  {
-  arradio-check-deps "md5sum" "curl" "xmllint"
+  arradio-check-deps "base64" "curl" "xmllint"
   [ $# -lt 1 ] && arradio-print-help
   local request_url="$1"
-  local cache_name="$(echo ${request_url} | md5sum | cut -d' ' -f1)"
+  local cache_name="$(echo ${request_url} | base64)"
   local cache_file="${ARRADIO_CACHEDIR}/${cache_name}"
   # store the response to cache
   if [ ${ARRADIO_NOCACHE} -eq 1 ] || [ ! -f "${cache_file}" ]; then
