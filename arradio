@@ -366,21 +366,39 @@ arradio-ui-set-theme() {
 arradio-ui() {
   arradio-check-deps "fzf"
   arradio-ui-set-theme
-  : | fzf \
-    --layout=reverse --info=inline \
-    --border=bold --border-label=" arradio v${ARRADIO_VERSION} " --border-label-pos=0 \
-    --header-lines=1 --no-separator \
-    --padding=1 \
-    --prompt "Favorites> " \
-    --preview 'arradio listen {1}' \
-    --preview-window 'down,40%,border,follow' \
-    --header $'\nCTRL-F Favorites | CTRL-T Top500 | +/- Favorites add/remove\n\n' \
-    --bind 'start:reload(arradio flist)' \
-    --bind 'enter:change-preview-window(up|down)' \
-    --bind 'ctrl-f:change-prompt(Favorites> )+reload(arradio flist)' \
-    --bind 'ctrl-t:change-prompt(Top500> )+reload(arradio top500)' \
-    --bind '+:change-prompt(Favorites> )+reload(arradio fadd {1}; arradio flist)' \
-    --bind '-:change-prompt(Favorites> )+reload(arradio fdel {1}; arradio flist)'
+  case $(arradio-get-fzf-version) in
+    0.4*)
+      : | fzf \
+        --layout=reverse --info=inline --cycle \
+        --border=bold --border-label=" arradio v${ARRADIO_VERSION} " --border-label-pos=0 \
+        --header-lines=1 --no-separator --padding=1 \
+        --prompt "Favorites> " \
+        --preview 'arradio listen {1}' \
+        --preview-window 'down,40%,border,follow' \
+        --header $'\nCTRL-F Favorites | CTRL-T Top500 | +/- Favorites add/remove\n\n' \
+        --bind 'start:reload(arradio flist)' \
+        --bind 'enter:change-preview-window(up|down)' \
+        --bind 'ctrl-f:change-prompt(Favorites> )+reload(arradio flist)' \
+        --bind 'ctrl-t:change-prompt(Top500> )+reload(arradio top500)' \
+        --bind '+:change-prompt(Favorites> )+reload(arradio fadd {1}; arradio flist)' \
+        --bind '-:change-prompt(Favorites> )+reload(arradio fdel {1}; arradio flist)'
+      ;;
+    *)
+      : | arradio-flist | fzf \
+        --layout=reverse --info=inline --cycle \
+        --border \
+        --header-lines=1 \
+        --prompt "arradio> " \
+        --preview 'arradio listen {1}' \
+        --preview-window 'down' \
+        --header $'\nCTRL-F Favorites | CTRL-T Top500 | +/- Favorites add/remove\n\n' \
+        --bind 'enter:ignore' \
+        --bind 'ctrl-f:reload(arradio flist)' \
+        --bind 'ctrl-t:reload(arradio top500)' \
+        --bind '+:reload(arradio fadd {1}; arradio flist)' \
+        --bind '-:reload(arradio fdel {1}; arradio flist)'
+      ;;
+  esac
 }
 
 export LC_ALL=${LC_ALL:-C}
