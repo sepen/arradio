@@ -374,10 +374,10 @@ arradio-ui() {
         --header-lines=1 --no-separator --padding=1 \
         --prompt "Favorites> " \
         --preview 'arradio listen {1}' \
-        --preview-window 'down,40%,border,follow' \
+        --preview-window 'down,33%,border,follow' \
         --header $'\nCTRL-F Favorites | CTRL-T Top500 | +/- Favorites add/remove\n\n' \
         --bind 'start:reload(arradio flist)' \
-        --bind 'enter:change-preview-window(up|down)' \
+        --bind 'enter:change-preview-window(down,66%|down)' \
         --bind 'ctrl-f:change-prompt(Favorites> )+reload(arradio flist)' \
         --bind 'ctrl-t:change-prompt(Top500> )+reload(arradio top500)' \
         --bind '+:change-prompt(Favorites> )+reload(arradio fadd {1}; arradio flist)' \
