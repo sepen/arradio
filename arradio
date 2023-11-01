@@ -36,60 +36,52 @@ arradio-print-version() {
 arradio-print-help() {
   cat << __HELP__
 Usage:
-  arradio [command]
+  arradio [command] <flags>
 
 Available Commands:
-  top500             Get top 500 radio stations
-  search [string]    Search for radio stations by keyword
-  listen [number]    Listen to specified radio station
-  fadd [number]      Add radio station to your favourites
-  fdel [number]      Delete radio station from your favourites
-  flist              List favourites radio stations
-  ui                 Start arradio in User Interface mode
-  help               Show this help information
-  version            Show version information
-  install            Install arradio itself
-  update             Update arradio itself
+  install                   Install arradio itself
+  update                    Update arradio itself
+  top500                    Get top 500 radio stations
+  search [string]           Search for radio stations by keyword
+  listen [number]           Listen to specified radio station
+  fadd [number]             Add radio station to your favourites
+  fdel [number]             Delete radio station from your favourites
+  flist                     List favourites radio stations
+  ui                        Start arradio in UI mode (User Interface)
+  themes-list               List installed UI themes
+  help                      Show this help information
+  version                   Show version information
 
-Flags::
-  -l, --limit [number]     Limit output lines (default: $ARRADIO_OUTPUT_LIMIT)
-  -o, --output [string]    Output list format simple or wide (default: $ARRADIO_OUTPUT_FILTER)
-  -p, --player [string]    Command to play the streams. Default: $ARRADIO_PLAYER_CMD
-  -t, --theme [string]     UI theme (default: $ARRADIO_UI_THEME)
-  -T, --list-themes        List available UI themes
-  -n, --no-cache           Perform a new URL requests before using a cached resource
-  -d, --debug              Enable debug messages
+Optional Flags:
+  -l, --limit [number]      Limit output lines (default: $ARRADIO_OUTPUT_LIMIT)
+  -o, --output [string]     Output list format simple or wide (default: $ARRADIO_OUTPUT_FILTER)
+  -p, --player [string]     Command to play the streams. Default: $ARRADIO_PLAYER_CMD
+  -t, --theme [string]      UI theme (default: $ARRADIO_UI_THEME)
+  -n, --no-cache            Do not use cached resources
+  -d, --debug               Enable debug messages
 __HELP__
   exit 0
 }
 
-arradio-get-opts() {
+arradio-set-flags() {
   while [ $1 ]; do
     case $1 in
-      --limit|-l)
-        ARRADIO_OUTPUT_LIMIT=$2
-        shift
+      -l|--limit)
+        shift 1 && ARRADIO_OUTPUT_LIMIT=$1
         ;;
-      --output|-o)
-        ARRADIO_OUTPUT_FILTER=$2
-        shift
+      -o|--output)
+        shift 1 && ARRADIO_OUTPUT_FILTER=$1
         ;;
-      --theme|-t)
-        ARRADIO_UI_THEME=$2
-        shift
+      -t|--theme)
+        shift 1 && ARRADIO_UI_THEME=$1
         ;;
-      --list-themes|-T)
-        arradio-ui-list-themes
-        exit 0
+      -p|--player)
+        shift 1 && ARRADIO_FORCE_PLAYER_CMD=$1
         ;;
-      --player|-p)
-        ARRADIO_FORCE_PLAYER_CMD=$2
-        shift
-        ;;
-      --nocache|-n)
+      -n|--no-cache)
         ARRADIO_NOCACHE=1
         ;;
-      --debug|-d)
+      -d|--debug)
         ARRADIO_DEBUG=1
         ;;
     esac
@@ -355,8 +347,9 @@ arradio-flist() {
 }
 
 # =============================================================================
-# USER INTERFACE
+# UI THEMES
 # =============================================================================
+
 arradio-ui-set-theme() {
   local ui_theme_color=''
   local ui_theme_vars=(
@@ -380,14 +373,25 @@ arradio-ui-set-theme() {
 }
 
 arradio-ui-list-themes() {
-  printf "%-20s %s\n" "THEME" "DESCRIPTION"
-  for ui_theme in ${ARRADIO_UI_THEME_DIR}/*; do
-    source ${ui_theme}
-    if [ ! -z "${ui_theme_name}" ] && [ ! -z "${ui_theme_description}" ]; then
-      printf "%-20s %s\n" "${ui_theme_name}" "${ui_theme_description}"
-    fi
-  done
+  arradio-check-deps "find"
+  local ui_themes="$(find ${ARRADIO_UI_THEME_DIR} -depth 1 2>/dev/null)"
+  if [ -z "${ui_themes}" ]; then
+    arradio-msg-info "No UI themes found. You can install arradio themes from:"
+    arradio-msg-info "  https://github.com/sepen/arradio/tree/master/ui-themes/"
+  else
+    printf "%-20s %s\n" "THEME" "DESCRIPTION"
+    for ui_theme in ${ui_themes[@]}; do
+      source ${ui_theme}
+      if [ ! -z "${ui_theme_name}" ] && [ ! -z "${ui_theme_description}" ]; then
+        printf "%-20s %s\n" "${ui_theme_name}" "${ui_theme_description}"
+      fi
+    done
+  fi
 }
+
+# =============================================================================
+# USER INTERFACE
+# =============================================================================
 
 arradio-ui() {
   arradio-check-deps "fzf"
@@ -460,21 +464,58 @@ readonly SHOUTCAST_API_URL="http://api.shoutcast.com/legacy/"
 # Show help when no arguments given
 [ $# -eq 0 ] && arradio-print-help
 
-arradio-get-opts $@
+arradio-set-flags $@
 
 while [ $1 ]; do
   case $1 in
-    top500) arradio-top500 ; break ;;
-    search) shift 1 ; arradio-search $@ ; break ;;
-    listen) shift 1 ; arradio-listen $1 ; break ;;
-    fadd) shift 1 ; arradio-fadd $1 ; break ;;
-    fdel) shift 1 ; arradio-fdel $1; break ;;
-    flist) arradio-flist ; break ;;
-    ui) arradio-ui ; break ;;
-    version) arradio-print-version ;;
-    install) arradio-install ;;
-    update) arradio-update ;;
-    *) arradio-print-help ;;
+    install)
+      arradio-install
+      break
+      ;;
+    update)
+      arradio-update
+      break
+      ;;
+    top500)
+      arradio-top500
+      break
+      ;;
+    search)
+      shift 1 && arradio-search $@
+      break
+      ;;
+    listen)
+      shift 1 && arradio-listen $1
+      break
+      ;;
+    fadd)
+      shift 1 && arradio-fadd $1
+      break
+      ;;
+    fdel)
+      shift 1 && arradio-fdel $1
+      break
+      ;;
+    flist)
+      arradio-flist
+      break
+      ;;
+    ui)
+      arradio-ui
+      break
+      ;;
+    themes-list)
+      arradio-ui-list-themes
+      break
+      ;;
+    version)
+      arradio-print-version
+      break
+      ;;
+    *)
+      arradio-print-help
+      break
+      ;;
   esac
   shift
 done
