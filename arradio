@@ -90,14 +90,22 @@ arradio-set-player() {
     arradio_player_cmd="${ARRADIO_FORCE_PLAYER_CMD}"
   else
     # Detection will be in order of preference
+    # - Look for the binary in PATH environment variable
+    # - Also check for the binary in macOS apps
     if type -P mpv >/dev/null 2>&1; then
       arradio_player_cmd="mpv --no-video"
+    elif test -f /Applications/mpv.app/Contents/MacOS/mpv >/dev/null 2>&1; then
+      arradio_player_cmd="/Applications/mpv.app/Contents/MacOS/mpv --no-video"
     elif type -P ffplay >/dev/null 2>&1; then
-      arradio_player_cmd="ffplay -vn"
+      arradio_player_cmd="ffplay -vn -nodisp"
     elif type -P mplayer >/dev/null 2>&1; then
       arradio_player_cmd="mplayer -vo null"
     elif type -P cvlc >/dev/null 2>&1; then
       arradio_player_cmd="cvlc --novideo"
+    elif type -P vlc >/dev/null 2>&1; then
+      arradio_player_cmd="vlc --novideo"
+    elif test -f /Applications/VLC.app/Contents/MacOS/VLC >/dev/null 2>&1; then
+      arradio_player_cmd="/Applications/VLC.app/Contents/MacOS/VLC --novideo"
     fi
   fi
   export ARRADIO_PLAYER_CMD=${arradio_player_cmd}
