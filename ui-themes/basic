@@ -1,47 +1,47 @@
 ui_theme_name="basic"
-ui_theme_description="Default arradio UI theme"
+ui_theme_description="Default arradio UI theme in 8-bit for better terminal support"
 
 # Main text
-fg='fg:#919191'
+fg='fg:246'
 # Preview window text
-preview_fg='preview-fg:#5F5F5F'
+preview_fg='preview-fg:242'
 # Background
-bg='bg:#101010'
+bg='bg:233'
 # Preview window background
-preview_bg='preview-bg:#101010'
+preview_bg='preview-bg:232'
 # Highlighted substrings
-hl='hl:#000000'
+hl='hl:33'
 # Text (current line)
-fg_plus='fg+:#FFFFFF'
+fg_plus='fg+:255'
 # Background (current line)
-bg_plus='bg+:#282828'
+bg_plus='bg+:238'
 # Gutter on the left
-gutter='gutter:#333333'
+gutter='gutter:234'
 # Highlighted substrings (current line)
-hl_plus='hl+:#878787'
+hl_plus='hl+:33'
 # Info line (match counters)
-info='info:#919191'
+info='info:240'
 # Border around the window (--border and --preview)
-border='border:#C1C1C1'
+border='border:238'
 # Main scrollbar
-scrollbar='scrollbar:#5F5F5F'
+scrollbar='scrollbar:240'
 # Border around the preview window (--preview)
-preview_border='preview-border:#C1C1C1'
+preview_border='preview-border:238'
 # Preview scrollbar
-preview_scrollbar='preview-scrollbar:#5F5F5F'
+preview_scrollbar='preview-scrollbar:240'
 # Horizontal separator on info line
-separator='separator:#C1C1C1'
+separator='separator:238'
 # Border label (--border-label and --preview-label)
-label='label:#696EF1'
+label='label:69'
 # Border label of the preview window (--preview-label)
-preview_label='preview-label:#696EF1'
+preview_label='preview-label:4'
 # Prompt
-prompt='prompt:#696EF1'
+prompt='prompt:69'
 # Pointer to the current line
-pointer='pointer:#696EF1'
+pointer='pointer:69'
 # Multi-select marker
-marker='marker:#696EF1'
+marker='marker:69'
 # Streaming input indicator
-spinner='spinner:#696EF1'
+spinner='spinner:69'
 # Header
-header='header:#5F5F5F'
+header='header:240'

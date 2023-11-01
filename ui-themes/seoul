@@ -1,4 +1,4 @@
-ui_theme_name="seoul256"
+ui_theme_name="seoul"
 ui_theme_description="Theme based on junegunn/seoul256.vim (light)"
 
 # Main text
