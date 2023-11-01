@@ -332,28 +332,58 @@ arradio-flist() {
 arradio-ui-set-theme() {
   case ${ARRADIO_UI_THEME} in
     light)
-      # junegunn/seoul256.vim (light)
-      export FZF_DEFAULT_OPTS='--color=bg+:#D9D9D9,bg:#E1E1E1,border:#C8C8C8,spinner:#719899,hl:#719872,fg:#616161,header:#719872,info:#727100,pointer:#E12672,marker:#E17899,fg+:#616161,preview-bg:#D9D9D9,prompt:#0099BD,hl+:#719899'
+      # based on: junegunn/seoul256.vim (light)
+      THEME_COLOR1='fg:#616161,preview-fg:#616161,bg:#E1E1E1,preview-bg:#E1E1E1'
+      THEME_COLOR2='hl:#719872,fg+:#616161,bg+:#D9D9D9,gutter:#808080,hl+:#719899'
+      THEME_COLOR3='info:#727100,border:#C8C8C8,scrollbar:#7E8E91,separator:#808080'
+      THEME_COLOR4='label:#0099BD,preview-label:#0099BD,prompt:#0099BD'
+      THEME_COLOR5='pointer:#E12672,marker:#E17899,spinner:#719899,header:#719872'
       ;;
     dark)
-      # junegunn/seoul256.vim (dark)
-      export FZF_DEFAULT_OPTS='--color=bg+:#3F3F3F,bg:#4B4B4B,border:#6B6B6B,spinner:#98BC99,hl:#719872,fg:#D9D9D9,header:#719872,info:#BDBB72,pointer:#E12672,marker:#E17899,fg+:#D9D9D9,preview-bg:#3F3F3F,prompt:#98BEDE,hl+:#98BC99'
+      # based on: junegunn/seoul256.vim (dark)
+      THEME_COLOR1='fg:#D9D9D9,preview-fg:#D9D9D9,bg:#4B4B4B,preview-bg:#3F3F3F'
+      THEME_COLOR2='hl:#719872,fg+:#D9D9D9,bg+:#3F3F3F,gutter:#808080,hl+:#98BC99'
+      THEME_COLOR3='info:#BDBB72,border:#6B6B6B,scrollbar:#7E8E91,separator:#808080'
+      THEME_COLOR4='label:#0099BD,preview-label:#0099BD,prompt:#98BEDE'
+      THEME_COLOR5='pointer:#E12672,marker:#E17899,spinner:#98BC99,header:#719872'
       ;;
     gruvbox)
-      # morhetz/gruvbox
-      export FZF_DEFAULT_OPTS='--color=bg+:#3c3836,bg:#32302f,spinner:#fb4934,hl:#928374,fg:#ebdbb2,header:#928374,info:#8ec07c,pointer:#fb4934,marker:#fb4934,fg+:#ebdbb2,prompt:#fb4934,hl+:#fb4934'
+      # based on: morhetz/gruvbox
+      THEME_COLOR1='fg:#EBDBB2,preview-fg:#EBDBB2,bg:#32302F,preview-bg:#32302F'
+      THEME_COLOR2='hl:#928374,fg+:#EBDBB2,bg+:#3C3836,gutter:#808080,hl+:#FB4934'
+      THEME_COLOR3='info:#8EC07C,border:#808080,scrollbar:#7E8E91,separator:#808080'
+      THEME_COLOR4='label:#FB4934,preview-label:#FB4934,prompt:#FB4934'
+      THEME_COLOR5='pointer:#FB4934,marker:#FB4934,spinner:#FB4934,header:#928374'
       ;;
     nord)
-      # arcticicestudio/nord-vim
-      export FZF_DEFAULT_OPTS='--color=bg+:#3B4252,bg:#2E3440,spinner:#81A1C1,hl:#616E88,fg:#D8DEE9,header:#616E88,info:#81A1C1,pointer:#81A1C1,marker:#81A1C1,fg+:#D8DEE9,prompt:#81A1C1,hl+:#81A1C1'
+      # based on: arcticicestudio/nord-vim
+      THEME_COLOR1='fg:#D8DEE9,preview-fg:#D8DEE9,bg:#2E3440,preview-bg:#2E3440'
+      THEME_COLOR2='hl:#616E88,fg+:#D8DEE9,bg+:#3B4252,gutter:#808080,hl+:#81A1C1'
+      THEME_COLOR3='info:#81A1C1,border:#808080,scrollbar:#7E8E91,separator:#808080'
+      THEME_COLOR4='label:#81A1C1,preview-label:#81A1C1,prompt:#81A1C1'
+      THEME_COLOR5='pointer:#81A1C1,marker:#81A1C1,spinner:#81A1C1,header:#616E88'
       ;;
     molokai)
-      # tomasr/molokai
-      export FZF_DEFAULT_OPTS='--color=bg+:#293739,bg:#1B1D1E,border:#808080,spinner:#E6DB74,hl:#7E8E91,fg:#F8F8F2,header:#7E8E91,info:#A6E22E,pointer:#A6E22E,marker:#F92672,fg+:#F8F8F2,prompt:#F92672,hl+:#F92672'
+      # based on: tomasr/molokai
+      THEME_COLOR1='fg:#F8F8F2,preview-fg:#F8F8F2,bg:#1B1D1E,preview-bg:#1B1D1E'
+      THEME_COLOR2='hl:#7E8E91,fg+:#F8F8F2,bg+:#293739,gutter:#808080,hl+:#F92672'
+      THEME_COLOR3='info:#A6E22E,border:#808080,scrollbar:#7E8E91,separator:#808080'
+      THEME_COLOR4='label:#F92672,preview-label:#F92672,prompt:#F92672'
+      THEME_COLOR5='pointer:#A6E22E,marker:#F92672,spinner:#E6DB74,header:#7E8E91'
+      ;;
+    purple)
+      THEME_COLOR1='fg:#AFAFAF,preview-fg:#AFAFAF,bg:#101010,preview-bg:#101010'
+      THEME_COLOR2='hl:#FFFFFF,fg+:#1C1C1C,bg+:#F1F1F1,gutter:#333333,hl+:#919191'
+      THEME_COLOR3='info:#FF2FF3,border:#4F0063,scrollbar:#F09FFE,separator:#4F0063'
+      THEME_COLOR4='label:#4F0063,preview-label:#FF2FF3,prompt:#FF2FF3'
+      THEME_COLOR5='pointer:#FF2FF3,marker:#FF2FF3,spinner:#FF2FF3,header:#F09FFE'
       ;;
     basic)
-      # basic
-      export FZF_DEFAULT_OPTS='--color=bg+:#282828,bg:#000000,border:#C1C1C1,spinner:#696EF1,hl:#000000,fg:#919191,header:#444444,info:#919191,pointer:#696EF1,marker:#696EF1,fg+:#FFFFFF,prompt:#696EF1,hl+:#878787,preview-fg:#3F3F3F'
+      THEME_COLOR1='fg:#919191,preview-fg:#5F5F5F,bg:#101010,preview-bg:#101010'
+      THEME_COLOR2='hl:#000000,fg+:#FFFFFF,bg+:#282828,gutter:#333333,hl+:#878787'
+      THEME_COLOR3='info:#919191,border:#C1C1C1,scrollbar:#5F5F5F,separator:#C1C1C1'
+      THEME_COLOR4='label:#696EF1,preview-label:#696EF1,prompt:#696EF1'
+      THEME_COLOR5='pointer:#696EF1,marker:#696EF1,spinner:#696EF1,header:#5F5F5F'
       ;;
     *)
       # no theme selected
@@ -361,6 +391,7 @@ arradio-ui-set-theme() {
       arradio-print-help
       ;;
   esac
+  export FZF_DEFAULT_OPTS="--color=${THEME_COLOR1} --color=${THEME_COLOR2} --color=${THEME_COLOR3} --color=${THEME_COLOR4} --color=${THEME_COLOR5}"
 }
 
 arradio-ui() {
