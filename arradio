@@ -14,7 +14,7 @@ arradio-msg-debug() {
 }
 
 arradio-msg-info() {
-  local msgprefix='\033[1;34m**'
+  local msgprefix='\033[0;32m**'
   local msgsuffix='\033[0m'
   [ ${ARRADIO_NOCOLOR} -eq 1 ] && msgprefix='**'
   echo -e "${msgprefix}${msgsuffix} $@"
@@ -398,8 +398,9 @@ arradio-ui() {
   arradio-check-deps "fzf"
   arradio-ui-set-theme
   case $(arradio-get-fzf-version) in
-    0.4*)
+    0.4[0-9].*)
       : | fzf \
+        --no-extended --exact \
         --layout=reverse --info=inline --cycle --no-mouse \
         --border=bold --border-label=" arradio v${ARRADIO_VERSION} " --border-label-pos=0 \
         --header-lines=1 --no-separator --padding=1 \
@@ -416,6 +417,7 @@ arradio-ui() {
       ;;
     *)
       : | arradio-flist | fzf \
+        --no-extended --exact \
         --layout=reverse --info=inline --cycle --no-mouse \
         --border \
         --header-lines=1 \
