@@ -368,6 +368,7 @@ arradio-ui-set-theme() {
     ui_theme_color="${ui_theme_color%,*}"
     export FZF_DEFAULT_OPTS+=" --color=${ui_theme_color}"
   else
+    arradio-msg-debug "UI theme not found"
     export FZF_DEFAULT_OPTS+=" --no-color"
   fi
 }
