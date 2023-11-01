@@ -1,0 +1,47 @@
+ui_theme_name="seoul256"
+ui_theme_description="Theme based on junegunn/seoul256.vim (light)"
+
+# Main text
+fg='fg:#616161'
+# Preview window text
+preview_fg='preview-fg:#616161'
+# Background
+bg='bg:#E1E1E1'
+# Preview window background
+preview_bg='preview-bg:#E1E1E1'
+# Highlighted substrings
+hl='hl:#719872'
+# Text (current line)
+fg_plus='fg+:#616161'
+# Background (current line)
+bg_plus='bg+:#D9D9D9'
+# Gutter on the left
+gutter='gutter:#808080'
+# Highlighted substrings (current line)
+hl_plus='hl+:#719899'
+# Info line (match counters)
+info='info:#727100'
+# Border around the window (--border and --preview)
+border='border:#C8C8C8'
+# Main scrollbar
+scrollbar='scrollbar:#7E8E91'
+# Border around the preview window (--preview)
+preview_border='preview-border:#C8C8C8'
+# Preview scrollbar
+preview_scrollbar='preview-scrollbar:#7E8E91'
+# Horizontal separator on info line
+separator='separator:#808080'
+# Border label (--border-label and --preview-label)
+label='label:#0099BD'
+# Border label of the preview window (--preview-label)
+preview_label='preview-label:#0099BD'
+# Prompt
+prompt='prompt:#0099BD'
+# Pointer to the current line
+pointer='pointer:#E12672'
+# Multi-select marker
+marker='marker:#E17899'
+# Streaming input indicator
+spinner='spinner:#719899'
+# Header
+header='header:#719872'

@@ -1,0 +1,47 @@
+ui_theme_name="molokai"
+ui_theme_description="Theme based on tomasr/molokai"
+
+# Main text
+fg='fg:#F8F8F2'
+# Preview window text
+preview_fg='preview-fg:#F8F8F2'
+# Background
+bg='bg:#1B1D1E'
+# Preview window background
+preview_bg='preview-bg:#1B1D1E'
+# Highlighted substrings
+hl='hl:#7E8E91'
+# Text (current line)
+fg_plus='fg+:#F8F8F2'
+# Background (current line)
+bg_plus='bg+:#293739'
+# Gutter on the left
+gutter='gutter:#808080'
+# Highlighted substrings (current line)
+hl_plus='hl+:#F92672'
+# Info line (match counters)
+info='info:#A6E22E'
+# Border around the window (--border and --preview)
+border='border:#808080'
+# Main scrollbar
+scrollbar='scrollbar:#7E8E91'
+# Border around the preview window (--preview)
+preview_border='preview-border:#808080'
+# Preview scrollbar
+preview_scrollbar='preview-scrollbar:#7E8E91'
+# Horizontal separator on info line
+separator='separator:#808080'
+# Border label (--border-label and --preview-label)
+label='label:#F92672'
+# Border label of the preview window (--preview-label)
+preview_label='preview-label:#F92672'
+# Prompt
+prompt='prompt:#F92672'
+# Pointer to the current line
+pointer='pointer:#A6E22E'
+# Multi-select marker
+marker='marker:#F92672'
+# Streaming input indicator
+spinner='spinner:#E6DB74'
+# Header
+header='header:#7E8E91'

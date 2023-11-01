@@ -1,0 +1,47 @@
+ui_theme_name="purple"
+ui_theme_description="Dark theme under purple rain"
+
+# Main text
+fg='fg:#AFAFAF'
+# Preview window text
+preview_fg='preview-fg:#AFAFAF'
+# Background
+bg='bg:#101010'
+# Preview window background
+preview_bg='preview-bg:#101010'
+# Highlighted substrings
+hl='hl:#FFFFFF'
+# Text (current line)
+fg_plus='fg+:#1C1C1C'
+# Background (current line)
+bg_plus='bg+:#F1F1F1'
+# Gutter on the left
+gutter='gutter:#333333'
+# Highlighted substrings (current line)
+hl_plus='hl+:#919191'
+# Info line (match counters)
+info='info:#FF2FF3'
+# Border around the window (--border and --preview)
+border='border:#4F0063'
+# Main scrollbar
+scrollbar='scrollbar:#F09FFE'
+# Border around the preview window (--preview)
+preview_border='preview-border:#4F0063'
+# Preview scrollbar
+preview_scrollbar='preview-scrollbar:#F09FFE'
+# Horizontal separator on info line
+separator='separator:#4F0063'
+# Border label (--border-label and --preview-label)
+label='label:#4F0063'
+# Border label of the preview window (--preview-label)
+preview_label='preview-label:#4F0063'
+# Prompt
+prompt='prompt:#FF2FF3'
+# Pointer to the current line
+pointer='pointer:#FF2FF3'
+# Multi-select marker
+marker='marker:#FF2FF3'
+# Streaming input indicator
+spinner='spinner:#FF2FF3'
+# Header
+header='header:#F09FFE'

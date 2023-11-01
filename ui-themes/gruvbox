@@ -1,0 +1,47 @@
+ui_theme_name="gruvbox"
+ui_theme_description="Theme based on morhetz/gruvbox"
+
+# Main text
+fg='fg:#EBDBB2'
+# Preview window text
+preview_fg='preview-fg:#EBDBB2'
+# Background
+bg='bg:#32302F'
+# Preview window background
+preview_bg='preview-bg:#32302F'
+# Highlighted substrings
+hl='hl:#928374'
+# Text (current line)
+fg_plus='fg+:#EBDBB2'
+# Background (current line)
+bg_plus='bg+:#3C3836'
+# Gutter on the left
+gutter='gutter:#808080'
+# Highlighted substrings (current line)
+hl_plus='hl+:#FB4934'
+# Info line (match counters)
+info='info:#8EC07C'
+# Border around the window (--border and --preview)
+border='border:#808080'
+# Main scrollbar
+scrollbar='scrollbar:#7E8E91'
+# Border around the preview window (--preview)
+preview_border='preview-border:#808080'
+# Preview scrollbar
+preview_scrollbar='preview-scrollbar:#7E8E91'
+# Horizontal separator on info line
+separator='separator:#808080'
+# Border label (--border-label and --preview-label)
+label='label:#FB4934'
+# Border label of the preview window (--preview-label)
+preview_label='preview-label:#FB4934'
+# Prompt
+prompt='prompt:#FB4934'
+# Pointer to the current line
+pointer='pointer:#FB4934'
+# Multi-select marker
+marker='marker:#FB4934'
+# Streaming input indicator
+spinner='spinner:#FB4934'
+# Header
+header='header:#928374'
