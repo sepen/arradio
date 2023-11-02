@@ -1,14 +1,10 @@
 ui_theme_name="purple"
 ui_theme_description="Dark theme under purple rain"
 
-export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS' --color=fg:#c9a84c,bg:#29212e,hl:#854ea3 
---color=fg+:#fff5e5,bg+:#29212e,hl+:#854ea3 
---color=info:#8f7f4d,prompt:#b04680,pointer:#854ea3 --color=marker:#854ea3,spinner:#ed3497,header:#8f7f4d'
-
 # Main text
-fg='fg:#c7b57e'
+fg='fg:#C289DB'
 # Preview window text
-preview_fg='preview-fg:#8f7f4d'
+preview_fg='preview-fg:#86529D'
 # Background
 bg='bg:#151217'
 # Preview window background
@@ -22,7 +18,7 @@ bg_plus='bg+:#29212e'
 # Gutter on the left
 gutter='gutter:#151217'
 # Highlighted substrings (current line)
-hl_plus='hl+:#854ea3'
+hl_plus='hl+:#b04680'
 # Info line (match counters)
 info='info:#8f7f4d'
 # Border around the window (--border and --preview)
