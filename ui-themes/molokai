@@ -16,7 +16,7 @@ fg_plus='fg+:#F8F8F2'
 # Background (current line)
 bg_plus='bg+:#293739'
 # Gutter on the left
-gutter='gutter:#808080'
+gutter='gutter:#1B1D1E'
 # Highlighted substrings (current line)
 hl_plus='hl+:#F92672'
 # Info line (match counters)

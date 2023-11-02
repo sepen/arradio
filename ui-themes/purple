@@ -1,47 +1,51 @@
 ui_theme_name="purple"
 ui_theme_description="Dark theme under purple rain"
 
+export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS' --color=fg:#c9a84c,bg:#29212e,hl:#854ea3 
+--color=fg+:#fff5e5,bg+:#29212e,hl+:#854ea3 
+--color=info:#8f7f4d,prompt:#b04680,pointer:#854ea3 --color=marker:#854ea3,spinner:#ed3497,header:#8f7f4d'
+
 # Main text
-fg='fg:#AFAFAF'
+fg='fg:#c7b57e'
 # Preview window text
-preview_fg='preview-fg:#AFAFAF'
+preview_fg='preview-fg:#8f7f4d'
 # Background
-bg='bg:#101010'
+bg='bg:#151217'
 # Preview window background
-preview_bg='preview-bg:#101010'
+preview_bg='preview-bg:#151217'
 # Highlighted substrings
 hl='hl:#FFFFFF'
 # Text (current line)
-fg_plus='fg+:#1C1C1C'
+fg_plus='fg+:#fff5e5'
 # Background (current line)
-bg_plus='bg+:#F1F1F1'
+bg_plus='bg+:#29212e'
 # Gutter on the left
-gutter='gutter:#333333'
+gutter='gutter:#151217'
 # Highlighted substrings (current line)
-hl_plus='hl+:#919191'
+hl_plus='hl+:#854ea3'
 # Info line (match counters)
-info='info:#FF2FF3'
+info='info:#8f7f4d'
 # Border around the window (--border and --preview)
-border='border:#4F0063'
+border='border:#8f7f4d'
 # Main scrollbar
-scrollbar='scrollbar:#F09FFE'
+scrollbar='scrollbar:#8f7f4d'
 # Border around the preview window (--preview)
-preview_border='preview-border:#4F0063'
+preview_border='preview-border:#8f7f4d'
 # Preview scrollbar
-preview_scrollbar='preview-scrollbar:#F09FFE'
+preview_scrollbar='preview-scrollbar:#8f7f4d'
 # Horizontal separator on info line
-separator='separator:#4F0063'
+separator='separator:#8f7f4d'
 # Border label (--border-label and --preview-label)
-label='label:#4F0063'
+label='label:#ed3497'
 # Border label of the preview window (--preview-label)
 preview_label='preview-label:#4F0063'
 # Prompt
-prompt='prompt:#FF2FF3'
+prompt='prompt:#b04680'
 # Pointer to the current line
-pointer='pointer:#FF2FF3'
+pointer='pointer:#4c8f5d'
 # Multi-select marker
-marker='marker:#FF2FF3'
+marker='marker:#854ea3'
 # Streaming input indicator
-spinner='spinner:#FF2FF3'
+spinner='spinner:#ed3497'
 # Header
-header='header:#F09FFE'
+header='header:#c9a84c'

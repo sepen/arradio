@@ -16,7 +16,7 @@ fg_plus='fg+:#EBDBB2'
 # Background (current line)
 bg_plus='bg+:#3C3836'
 # Gutter on the left
-gutter='gutter:#808080'
+gutter='gutter:#32302F'
 # Highlighted substrings (current line)
 hl_plus='hl+:#FB4934'
 # Info line (match counters)
@@ -38,9 +38,9 @@ preview_label='preview-label:#FB4934'
 # Prompt
 prompt='prompt:#FB4934'
 # Pointer to the current line
-pointer='pointer:#FB4934'
+pointer='pointer:#8EC07C'
 # Multi-select marker
-marker='marker:#FB4934'
+marker='marker:#8EC07C'
 # Streaming input indicator
 spinner='spinner:#FB4934'
 # Header
