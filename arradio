@@ -361,10 +361,23 @@ arradio-ui-set-theme() {
     source ${ARRADIO_UI_THEME_DIR}/${ARRADIO_UI_THEME}
     for ui_theme_var in ${ui_theme_vars[@]}; do
       if [ ! -z ${ui_theme_var} ]; then
-        ui_theme_color+="${!ui_theme_var},"
+        case $(arradio-get-fzf-version) in
+          0.4[0-9].*)
+            ui_theme_color+="${!ui_theme_var},"
+            ;;
+          *)
+            case ${ui_theme_var} in
+              'scrollbar'|'preview_border'|'preview_scrollbar'|'separator'|'label'|'preview_label')
+                ;;
+              *)
+                ui_theme_color+="${!ui_theme_var},"
+                ;;
+            esac
+            ;;
+        esac
       fi
     done
-    # remove last , char
+    # qremove last , char
     ui_theme_color="${ui_theme_color%,*}"
     export FZF_DEFAULT_OPTS+=" --color=${ui_theme_color}"
   else
