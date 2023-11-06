@@ -9,12 +9,14 @@ Listen to internet radio stations from the terminal.
 
 <img src="https://user-images.githubusercontent.com/11802175/280811770-c1db1da9-f392-4cd9-b954-8869cfe5e64a.png">
 
+
 ## Features
 
 - Gets radio stations from the [SHOUTcast](https://directory.shoutcast.com/) directory
 - Manage a list of favorite radio stations
 - Use multiple audio players ([mpv](https://mpv.io), [vlc](https://www.videolan.org), [ffplay](https://ffmpeg.org/), etc.) to play radio stations
 - Optional pseudo-user interface for terminal based on [fzf](https://github.com/junegunn/fzf) with support for 8-bit and 24-bit color themes.
+
 
 ## Table of Contents
 
@@ -28,6 +30,7 @@ Listen to internet radio stations from the terminal.
   * [Installing a theme](#installing-themes)
   * [Create a new theme](#create-a-new-theme)
 
+
 ## Requirements
 
 - Common tools found on most UNIX systems: (_bash_, _cut_, _grep_, _sed_, _head_, _cat_)
@@ -38,12 +41,9 @@ Listen to internet radio stations from the terminal.
   - [vlc](https://www.videolan.org)
   - [ffplay](https://ffmpeg.org/)
   - [arradio-player](https://github.com/sepen/arradio-player)
-- (optional) External fuzzy finder for the User Interface:
-  - [fzf](https://github.com/junegunn/fzf) is installed
+- (optional) External command for the User Interface: [fzf](https://github.com/junegunn/fzf)
 
-![demo](demo/arradio.gif)
 
----
 
 ## Installation
 
@@ -55,6 +55,7 @@ curl -fsSL https://raw.githubusercontent.com/sepen/arradio/master/arradio | bash
 The one-liner command from above installs **arradio** to its default, `$HOME/.arradio` and will place some files under that prefix, so you'll need to set your PATH like this `export PATH=$HOME/.arradio/bin:$PATH`. \
 The installation explains what it will do, and you will see all that information. Consider adding this line to your _~/.bashrc_ or _~/.bash_profile_ or make sure to export this _PATH_ before running **arradio**. The installation explains what it will do. \
 The one-liner installation method found on **arradio** uses Bash. Notably, zsh, fish, tcsh and csh will not work.
+
 
 ## Upgrading arradio
 
@@ -118,15 +119,11 @@ arradio fadd 99498012
 
 To list my favourites:
 ```sh
-arradio flist -o wide
- STATION  GENRE               NAME                                    INFO
-99498012  Rock                ROCK ANTENNE                            Creedence Clearwater Revival - Bad moon rising
+arradio flist
+ STATION  GENRE               NAME
+99498012  Rock                ROCK ANTENNE
 ```
 
-To remove it from my favorites:
-```sh
-arradio fdel 99498012
-```
 
 ## UI mode
 
@@ -151,7 +148,7 @@ arradio themes
 
 Installing themes
 ```sh
-curl -o ~/.arradio/ui-themes/molokai -s https://raw.githubusercontent.com/sepen/arradio/master/ui-themes/molokai
+curl -o ~/.arradio/ui-themes/molokai -fsSL https://raw.githubusercontent.com/sepen/arradio/master/ui-themes/molokai
 ```
 
 Use a theme in UI mode:
