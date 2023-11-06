@@ -95,44 +95,47 @@ Optional Flags:
 
 ## Examples
 
-Look for radio stations with the words _smooth_ and _jazz_ and limit the list to only 2 stations with wide output format:
+Look for radio stations with the words _rock_ and _metal_ and limit the list to only 5 stations with wide output format:
 ```sh
-arradio search smooth jazz -l 2 -o wide
+arradio search rock -l 5 -o wide
  STATION  GENRE               NAME                                    INFO
-99426190  Smooth Jazz         BEST SMOOTH JAZZ - UK (LONDON) HOST RO  Host Rod Lucas - Londons Best Smooth Jazz UK
- 1852944  Smooth Jazz         1.FM - Bay Smooth Jazz (www.1.fm)
+99498012  Rock                ROCK ANTENNE                            Creedence Clearwater Revival - Bad moon rising
+99497966  Heavy Metal         ROCK ANTENNE Heavy Metal (Germany)      Nightwish - Amaranth
+99497948  80s                 ANTENNE BAYERN 80er Hits                Donna Summer - On the radio
+ 1542116  Pop                 POWERHITZ.COM - THE OFFICEMIX - The Be  
+99497950  Rock                ANTENNE BAYERN Classic Rock             Steve Miller Band - Abracadabra
 ```
 
-To play the second radio station in the list:
+To play a radio station the use the STATION id from first column:
 ```sh
-arradio listen 1852944
+arradio listen 99498012
 ```
 
 To add it to my favorites:
 ```sh
-arradio fadd 1852944
+arradio fadd 99498012
 ```
 
 To list my favourites:
 ```sh
-arradio flist
- STATION  GENRE               NAME
- 1852944  Smooth Jazz         1.FM - Bay Smooth Jazz (www.1.fm)
+arradio flist -o wide
+ STATION  GENRE               NAME                                    INFO
+99498012  Rock                ROCK ANTENNE                            Creedence Clearwater Revival - Bad moon rising
 ```
 
 To remove it from my favorites:
 ```sh
-arradio fdel 1852944
+arradio fdel 99498012
 ```
 
-## User Interface
+## UI mode
 
 `arradio` can run in pseudo-terminal User Interface mode. You just need to have _fzf_ installed and then you can run the following command to start UI mode:
 ```sh
 arradio ui
 ```
 
-## UI Themes
+## UI themes
 
 `arradio` can perfectly work in UI mode without any theme installed. It will use a basic black and white interface. But maybe you prefer to use a theme with fancy colors.
 
@@ -141,17 +144,17 @@ To see the current themes available in this repository go to [ui-themes](ui-them
 
 You can use any of them, but keep in mind if your terminal supports 24-bit or truecolor, if not, it will be better to use the themes for 8-bit colors
 
-### List installed themes
+List installed themes
 ```sh
 arradio themes
 ```
 
-### Installing themes
+Installing themes
 ```sh
 curl -o ~/.arradio/ui-themes/molokai -s https://raw.githubusercontent.com/sepen/arradio/master/ui-themes/molokai
 ```
 
-### Use a theme in UI mode:
+Use a theme in UI mode:
 ```sh
 arradio ui -t molokai
 ```
