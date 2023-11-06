@@ -9,9 +9,20 @@ Listen to internet radio stations from the terminal.
 ![Code Size](https://img.shields.io/github/languages/code-size/sepen/k8kreator)
 ![Proudly Written in Bash](https://img.shields.io/badge/written%20in-bash-ff69b4)
 
-The main utility of _arradio_ is to search for radio stations in the ShoutCAST directory, save the favorite radio stations for later and avoid manual link management to the streaming url for every time you want to listen to a radio station.
 
-This program does not play streams directly, this is delegated to _mpv_, _mplayer_ or _vlc_ program, so one of these programs must be previously installed.
+## Features
+
+* Gets radio stations from the [SHOUTcast](https://directory.shoutcast.com/) directory
+* Manage a list of favorite radio stations
+* Use multiple audio players ([mpv](https://mpv.io), [vlc](https://www.videolan.org), [ffplay](https://ffmpeg.org/), etc.) to play radio stations
+* Optional pseudo-user interface for terminal based on [fzf](https://github.com/junegunn/fzf) with support for 8-bit and 24-bit color themes.
+
+## Requirements
+
+* Basic tools found on most UNIX systems: _cut_, _grep_, _sed_, _head_, _cat_
+* XML tools are used to parse URL responses from [SHOUTcast](https://directory.shoutcast.com/) directory: [xmllint](https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home)
+* This program does not play streams directly, this is delegated to [mpv](https://mpv.io), [vlc](https://www.videolan.org), [ffplay](https://ffmpeg.org/), etc. program, so one of these programs must be previously installed.
+* User Interface mode enabled when detected that [fzf](https://github.com/junegunn/fzf) is installed
 
 ![demo](demo/arradio.gif)
 
@@ -21,7 +32,7 @@ This program does not play streams directly, this is delegated to _mpv_, _mplaye
 
 To install **arradio** paste that in a macOS Terminal or Linux shell prompt:
 ```
-$ curl -fsSL https://raw.githubusercontent.com/sepen/arradio/master/arradio | bash -s self-install
+$ curl -fsSL https://raw.githubusercontent.com/sepen/arradio/master/arradio | bash -s install
 ```
 
 The one-liner command from above installs **arradio** to its default, `$HOME/.arradio` and will place some files under that prefix, so you'll need to set your PATH like this `export PATH=$HOME/.arradio/bin:$PATH`. \
@@ -33,24 +44,29 @@ The one-liner installation method found on **arradio** uses Bash. Notably, zsh, 
 ## Usage
 ```
 Usage:
-  arradio [command]
+  arradio [command] <flags>
 
 Available Commands:
-  top500             Get arradio-top500 radio stations
-  random             Get random list of radio stations
-  search  string     Search for radio stations by keyword
-  listen  id         Listen specified StationID
-  fadd    id         Add radio station to your favourites
-  fdel    id         Delete radio station from your favourites
-  flist              List favourites radio stations
-  help               Show this help information
-  version            Show version information
-  self-install       Install arradio itself
-  self-update        Update arradio itself
+  install                   Install arradio itself
+  update                    Update arradio itself
+  top500                    Get top 500 radio stations
+  search [string]           Search for radio stations by keyword
+  listen [number]           Listen to specified radio station
+  fadd [number]             Add radio station to your favourites
+  fdel [number]             Delete radio station from your favourites
+  flist                     List favourites radio stations
+  ui                        Start arradio in UI mode (User Interface)
+  themes                    List installed UI themes
+  help                      Show this help information
+  version                   Show version information
 
-Flags::
-  -l number          Limit the number of stations to search and display
-  -w                 Wide output format
+Optional Flags:
+  -l, --limit [number]      Limit output lines (default: 20)
+  -o, --output [string]     Output list format simple or wide (default: simple)
+  -p, --player [string]     Command to play the streams. Default: arradio-player
+  -t, --theme [string]      UI theme (default: basic)
+  -n, --no-cache            Do not use cached resources
+  -d, --debug               Enable debug messages
 ```
 
 ---
@@ -59,38 +75,30 @@ Flags::
 
 I want to find radio stations with the words _smooth_ and _jazz_. I limit the list to only 2 stations _(-l 2)_ and I want wide output format _(-w)_.
 ```
-$ arradio search smooth jazz -l 2 -w
-StationName:	SmoothJazz.com Global
-MediaType:	audio/mpeg
-StationID:	1477271
-Bitrate:	128
-Genre:		Smooth Jazz genre2=Jazz logo=http://i.radionomy.com/document/radios/7/7d37/7d37f56b-67ff-40b7-9102-bc15172d7831.jpg
-
-StationName:	Smooth Jazz CD101.9 New York 64K
-MediaType:	audio/mpeg
-StationID:	1541073
-Bitrate:	128
-Genre:		Smooth Jazz genre2=Acid Jazz genre3=Jazz genre4=Easy Listening genre5=Jazz logo=http://i.radionomy.com/document/radios/d/d8d7/d8d7a5f6-df88-4bd9-b5b2-e02b4fcaf661.jpg
-Playing:	Brian Simpson - Out Of A Dream (Featuring Najee)
+$ arradio search smooth jazz -l 2 -o wide
+ STATION  GENRE               NAME                                    INFO
+99426190  Smooth Jazz         BEST SMOOTH JAZZ - UK (LONDON) HOST RO  Host Rod Lucas - Londons Best Smooth Jazz UK
+ 1852944  Smooth Jazz         1.FM - Bay Smooth Jazz (www.1.fm)
 ```
 
-Now I want to listen the second radio station in the list. To do this I use the value of _StationID_.
+Now I want to listen the second radio station in the list. To do this I use the value of _STATION_.
 ```
-$ arradio listen 1541073
+$ arradio listen 1852944
 ```
 
 I like it, so I add it to my favorites.
 ```
-$ arradio fadd 1541073
+$ arradio fadd 1852944
 ```
 
 I want to list my favourites.
 ```
 $ arradio flist
- 1541073 Smooth Jazz CD101.9 New York 64K
+ STATION  GENRE               NAME
+ 1852944  Smooth Jazz         1.FM - Bay Smooth Jazz (www.1.fm)
 ```
 
-I do not like it anymore. I remove it from my favorites.
+To remove it from my favorites.
 ```
-$ arradio fdel 1541073
+$ arradio fdel 1852944
 ```
