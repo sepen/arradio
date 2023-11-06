@@ -1,5 +1,3 @@
-<img src="https://user-images.githubusercontent.com/11802175/280811770-c1db1da9-f392-4cd9-b954-8869cfe5e64a.png" width="200">
-
 # `arradio`
 
 Listen to internet radio stations from the terminal.
@@ -8,6 +6,8 @@ Listen to internet radio stations from the terminal.
 ![Repo Size](https://img.shields.io/github/repo-size/sepen/arradio)
 ![Code Size](https://img.shields.io/github/languages/code-size/sepen/arradio)
 ![Proudly Written in Bash](https://img.shields.io/badge/written%20in-bash-ff69b4)
+
+<img src="https://user-images.githubusercontent.com/11802175/280811770-c1db1da9-f392-4cd9-b954-8869cfe5e64a.png">
 
 ## Features
 
