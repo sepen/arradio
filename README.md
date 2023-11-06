@@ -12,10 +12,10 @@ Listen to internet radio stations from the terminal.
 
 ## Features
 
-- Gets radio stations from the [SHOUTcast](https://directory.shoutcast.com/) directory
+- Search radio stations from the [SHOUTcast](https://directory.shoutcast.com/) directory
 - Manage a list of favorite radio stations
 - Use multiple audio players ([mpv](https://mpv.io), [vlc](https://www.videolan.org), [ffplay](https://ffmpeg.org/), etc.) to play radio stations
-- Optional pseudo-user interface for terminal based on [fzf](https://github.com/junegunn/fzf) with support for 8-bit and 24-bit color themes.
+- Optional pseudo-user interface for terminal with color theme support.
 
 
 ## Table of Contents
