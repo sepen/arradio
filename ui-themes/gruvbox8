@@ -1,26 +1,26 @@
-ui_theme_name="molokai"
-ui_theme_description="Theme based on tomasr/molokai"
+ui_theme_name="gruvbox8"
+ui_theme_description="Theme based on morhetz/gruvbox with 8-bit colors"
 
 # Main text
-fg='fg:#F8F8F2'
+fg='fg:230'
 # Preview window text
-preview_fg='preview-fg:#F8F8F2'
+preview_fg='preview-fg:230'
 # Background
-bg='bg:#1B1D1E'
+bg='bg:236'
 # Preview window background
-preview_bg='preview-bg:#1B1D1E'
+preview_bg='preview-bg:236'
 # Highlighted substrings
-hl='hl:#7E8E91'
+hl='hl:245'
 # Text (current line)
-fg_plus='fg+:#F8F8F2'
+fg_plus='fg+:230'
 # Background (current line)
-bg_plus='bg+:#293739'
+bg_plus='bg+:238'
 # Gutter on the left
-gutter='gutter:#1B1D1E'
+gutter='gutter:236'
 # Highlighted substrings (current line)
-hl_plus='hl+:#F92672'
+hl_plus='hl+:202'
 # Info line (match counters)
-info='info:#A6E22E'
+info='info:71'
 # Border around the window (--border and --preview)
 border='border:#808080'
 # Main scrollbar
@@ -32,16 +32,16 @@ preview_scrollbar='preview-scrollbar:#7E8E91'
 # Horizontal separator on info line
 separator='separator:#808080'
 # Border label (--border-label and --preview-label)
-label='label:#F92672'
+label='label:202'
 # Border label of the preview window (--preview-label)
-preview_label='preview-label:#F92672'
+preview_label='preview-label:202'
 # Prompt
-prompt='prompt:#F92672'
+prompt='prompt:202'
 # Pointer to the current line
-pointer='pointer:#A6E22E'
+pointer='pointer:#8EC07C'
 # Multi-select marker
-marker='marker:#F92672'
+marker='marker:#8EC07C'
 # Streaming input indicator
-spinner='spinner:#E6DB74'
+spinner='spinner:202'
 # Header
-header='header:#7E8E91'
+header='header:145'

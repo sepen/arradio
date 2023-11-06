@@ -1,0 +1,47 @@
+ui_theme_name="purple8"
+ui_theme_description="Purple theme with 8-bit colors"
+
+# Main text
+fg='fg:141'
+# Preview window text
+preview_fg='preview-fg:97'
+# Background
+bg='bg:233'
+# Preview window background
+preview_bg='preview-bg:233'
+# Highlighted substrings
+hl='hl:255'
+# Text (current line)
+fg_plus='fg+:255'
+# Background (current line)
+bg_plus='bg+:235'
+# Gutter on the left
+gutter='gutter:233'
+# Highlighted substrings (current line)
+hl_plus='hl+:127'
+# Info line (match counters)
+info='info:137'
+# Border around the window (--border and --preview)
+border='border:137'
+# Main scrollbar
+scrollbar='scrollbar:137'
+# Border around the preview window (--preview)
+preview_border='preview-border:137'
+# Preview scrollbar
+preview_scrollbar='preview-scrollbar:137'
+# Horizontal separator on info line
+separator='separator:137'
+# Border label (--border-label and --preview-label)
+label='label:127'
+# Border label of the preview window (--preview-label)
+preview_label='preview-label:127'
+# Prompt
+prompt='prompt:127'
+# Pointer to the current line
+pointer='pointer:127'
+# Multi-select marker
+marker='marker:127'
+# Streaming input indicator
+spinner='spinner:161'
+# Header
+header='header:137'

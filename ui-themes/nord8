@@ -1,0 +1,47 @@
+ui_theme_name="nord8"
+ui_theme_description="Theme based on arcticicestudio/nord-vim with 8-bit colors"
+
+# Main text
+fg='fg:145'
+# Preview window text
+preview_fg='preview-fg:145'
+# Background
+bg='bg:235'
+# Preview window background
+preview_bg='preview-bg:235'
+# Highlighted substrings
+hl='hl:60'
+# Text (current line)
+fg_plus='fg+:255'
+# Background (current line)
+bg_plus='bg+:236'
+# Gutter on the left
+gutter='gutter:235'
+# Highlighted substrings (current line)
+hl_plus='hl+:67'
+# Info line (match counters)
+info='info:67'
+# Border around the window (--border and --preview)
+border='border:245'
+# Main scrollbar
+scrollbar='scrollbar:245'
+# Border around the preview window (--preview)
+preview_border='preview-border:245'
+# Preview scrollbar
+preview_scrollbar='preview-scrollbar:245'
+# Horizontal separator on info line
+separator='separator:245'
+# Border label (--border-label and --preview-label)
+label='label:67'
+# Border label of the preview window (--preview-label)
+preview_label='preview-label:67'
+# Prompt
+prompt='prompt:67'
+# Pointer to the current line
+pointer='pointer:67'
+# Multi-select marker
+marker='marker:67'
+# Streaming input indicator
+spinner='spinner:67'
+# Header
+header='header:59'
