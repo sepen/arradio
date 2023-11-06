@@ -75,6 +75,7 @@ Available Commands:
   top500                    Get top 500 radio stations
   search [string]           Search for radio stations by keyword
   listen [number]           Listen to specified radio station
+  info [number]             Get information for specified radio station
   fadd [number]             Add radio station to your favourites
   fdel [number]             Delete radio station from your favourites
   flist                     List favourites radio stations

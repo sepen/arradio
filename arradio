@@ -297,6 +297,25 @@ arradio-listen() {
 }
 
 # =============================================================================
+# INFO
+# =============================================================================
+
+arradio-info() {
+  arradio-check-deps "grep" "sort"
+  local station_id="$1"
+  local station_url="$(arradio-get-station-url $station_id)"
+  if [ -z ${station_url} ]; then
+    arradio-msg-error "station_url not found for station_id ${station_id}"
+  fi
+  echo "id: ${station_id}"
+  grep -e '^name:' ${ARRADIO_DBDIR}/${station_id}
+  grep -e '^genre:' ${ARRADIO_DBDIR}/${station_id}
+  grep -e '^url:' ${ARRADIO_DBDIR}/${station_id}
+  grep -e '^br:' ${ARRADIO_DBDIR}/${station_id}
+  grep -e '^info:' ${ARRADIO_DBDIR}/${station_id}
+}
+
+# =============================================================================
 # FAVOURITES
 # =============================================================================
 
@@ -418,15 +437,16 @@ arradio-ui() {
         --border=bold --border-label=" arradio v${ARRADIO_VERSION} " --border-label-pos=0 \
         --header-lines=1 --no-separator --padding=1 \
         --prompt "Favorites> " \
-        --preview 'arradio listen {1}' \
+        --preview 'arradio info {1}' \
         --preview-window 'down,33%,border,follow' \
-        --header $'\nCTRL-F Favorites | CTRL-T Top500 | +/- Favorites add/remove\n\n' \
-        --bind 'start:reload(arradio flist)' \
-        --bind 'enter:change-preview-window(down,66%|down)' \
-        --bind 'ctrl-f:change-prompt(Favorites> )+reload(arradio flist)' \
-        --bind 'ctrl-t:change-prompt(Top500> )+reload(arradio top500)' \
-        --bind '+:change-prompt(Favorites> )+reload(arradio fadd {1}; arradio flist)' \
-        --bind '-:change-prompt(Favorites> )+reload(arradio fdel {1}; arradio flist)'
+        --header $'\nCTRL-F Favorites | CTRL-F Top Stations | ENTER To Play | +/- Favorites add/remove\n\n' \
+        --bind 'start:reload(arradio flist)+change-preview(arradio info {1})' \
+        --bind 'enter:change-preview(arradio listen {1})' \
+        --bind 'focus:change-preview(arradio info {1})' \
+        --bind 'ctrl-f:reload(arradio flist)+change-prompt(Favorites> )+change-preview(arradio info {1})' \
+        --bind 'ctrl-t:reload(arradio top500)+change-prompt(Top500> )+change-preview(arradio info {1})' \
+        --bind '+:reload(arradio fadd {1}; arradio flist)+change-prompt(Favorites> )+change-preview(arradio info {1})' \
+        --bind '-:reload(arradio fdel {1}; arradio flist)+change-prompt(Favorites> )+change-preview(arradio info {1})'
       ;;
     *)
       : | arradio-flist | fzf \
@@ -502,6 +522,10 @@ while [ $1 ]; do
       ;;
     listen)
       shift 1 && arradio-listen $1
+      break
+      ;;
+    info)
+      shift 1 && arradio-info $1
       break
       ;;
     fadd)
