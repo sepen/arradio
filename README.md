@@ -1,4 +1,4 @@
-<img src="https://github.com/sepen/arradio/assets/11802175/5a96278b-19ff-4e06-8871-846adb48d3fd" width="200">
+<img src="https://user-images.githubusercontent.com/11802175/280811770-c1db1da9-f392-4cd9-b954-8869cfe5e64a.png" width="200">
 
 # `arradio`
 
@@ -9,20 +9,37 @@ Listen to internet radio stations from the terminal.
 ![Code Size](https://img.shields.io/github/languages/code-size/sepen/arradio)
 ![Proudly Written in Bash](https://img.shields.io/badge/written%20in-bash-ff69b4)
 
-
 ## Features
 
-* Gets radio stations from the [SHOUTcast](https://directory.shoutcast.com/) directory
-* Manage a list of favorite radio stations
-* Use multiple audio players ([mpv](https://mpv.io), [vlc](https://www.videolan.org), [ffplay](https://ffmpeg.org/), etc.) to play radio stations
-* Optional pseudo-user interface for terminal based on [fzf](https://github.com/junegunn/fzf) with support for 8-bit and 24-bit color themes.
+- Gets radio stations from the [SHOUTcast](https://directory.shoutcast.com/) directory
+- Manage a list of favorite radio stations
+- Use multiple audio players ([mpv](https://mpv.io), [vlc](https://www.videolan.org), [ffplay](https://ffmpeg.org/), etc.) to play radio stations
+- Optional pseudo-user interface for terminal based on [fzf](https://github.com/junegunn/fzf) with support for 8-bit and 24-bit color themes.
+
+## Table of Contents
+
+* [Requirements](#requirements)
+* [Installation](#installation)
+* [Upgrading arradio](#upgrading-arradio)
+* [Usage](#usage)
+  * [Examples](#examples)
+* [UI Mode](#ui-mode)
+* [UI Themes](#ui-themes)
+  * [Installing a theme](#installing-themes)
+  * [Create a new theme](#create-a-new-theme)
 
 ## Requirements
 
-* Basic tools found on most UNIX systems: _cut_, _grep_, _sed_, _head_, _cat_
-* XML tools are used to parse URL responses from [SHOUTcast](https://directory.shoutcast.com/) directory: [xmllint](https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home)
-* This program does not play streams directly, this is delegated to [mpv](https://mpv.io), [vlc](https://www.videolan.org), [ffplay](https://ffmpeg.org/), etc. program, so one of these programs must be previously installed.
-* User Interface mode enabled when detected that [fzf](https://github.com/junegunn/fzf) is installed
+- Common tools found on most UNIX systems: (_bash_, _cut_, _grep_, _sed_, _head_, _cat_)
+- XML tools are required to parse URL responses from [SHOUTcast](https://directory.shoutcast.com/) directory
+  - [xmllint](https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home)
+- External audio player. This program does not play URL streams directly, this is delegated to an external audio player that should be installed on the system. The following ones are detected automatically if installed.
+  - [mpv](https://mpv.io)
+  - [vlc](https://www.videolan.org)
+  - [ffplay](https://ffmpeg.org/)
+  - [arradio-player](https://github.com/sepen/arradio-player)
+- (optional) External fuzzy finder for the User Interface:
+  - [fzf](https://github.com/junegunn/fzf) is installed
 
 ![demo](demo/arradio.gif)
 
@@ -31,15 +48,20 @@ Listen to internet radio stations from the terminal.
 ## Installation
 
 To install **arradio** paste that in a macOS Terminal or Linux shell prompt:
-```
-$ curl -fsSL https://raw.githubusercontent.com/sepen/arradio/master/arradio | bash -s install
+```shell
+curl -fsSL https://raw.githubusercontent.com/sepen/arradio/master/arradio | bash -s install
 ```
 
 The one-liner command from above installs **arradio** to its default, `$HOME/.arradio` and will place some files under that prefix, so you'll need to set your PATH like this `export PATH=$HOME/.arradio/bin:$PATH`. \
 The installation explains what it will do, and you will see all that information. Consider adding this line to your _~/.bashrc_ or _~/.bash_profile_ or make sure to export this _PATH_ before running **arradio**. The installation explains what it will do. \
 The one-liner installation method found on **arradio** uses Bash. Notably, zsh, fish, tcsh and csh will not work.
 
----
+## Upgrading arradio
+
+`arradio` is being actively developed, and you might want to upgrade it once in a while. Please follow the instruction below:
+```shell
+arradio upgrade
+```
 
 ## Usage
 ```
@@ -48,7 +70,7 @@ Usage:
 
 Available Commands:
   install                   Install arradio itself
-  update                    Update arradio itself
+  upgrade                   Upgrade arradio itself
   top500                    Get top 500 radio stations
   search [string]           Search for radio stations by keyword
   listen [number]           Listen to specified radio station
@@ -73,32 +95,63 @@ Optional Flags:
 
 ## Examples
 
-I want to find radio stations with the words _smooth_ and _jazz_. I limit the list to only 2 stations _(-l 2)_ and I want wide output format _(-w)_.
-```
-$ arradio search smooth jazz -l 2 -o wide
+Look for radio stations with the words _smooth_ and _jazz_ and limit the list to only 2 stations with wide output format:
+```sh
+arradio search smooth jazz -l 2 -o wide
  STATION  GENRE               NAME                                    INFO
 99426190  Smooth Jazz         BEST SMOOTH JAZZ - UK (LONDON) HOST RO  Host Rod Lucas - Londons Best Smooth Jazz UK
  1852944  Smooth Jazz         1.FM - Bay Smooth Jazz (www.1.fm)
 ```
 
-Now I want to listen the second radio station in the list. To do this I use the value of _STATION_.
-```
-$ arradio listen 1852944
-```
-
-I like it, so I add it to my favorites.
-```
-$ arradio fadd 1852944
+To play the second radio station in the list:
+```sh
+arradio listen 1852944
 ```
 
-I want to list my favourites.
+To add it to my favorites:
+```sh
+arradio fadd 1852944
 ```
-$ arradio flist
+
+To list my favourites:
+```sh
+arradio flist
  STATION  GENRE               NAME
  1852944  Smooth Jazz         1.FM - Bay Smooth Jazz (www.1.fm)
 ```
 
-To remove it from my favorites.
+To remove it from my favorites:
+```sh
+arradio fdel 1852944
 ```
-$ arradio fdel 1852944
+
+## User Interface
+
+`arradio` can run in pseudo-terminal User Interface mode. You just need to have _fzf_ installed and then you can run the following command to start UI mode:
+```sh
+arradio ui
+```
+
+## UI Themes
+
+`arradio` can perfectly work in UI mode without any theme installed. It will use a basic black and white interface. But maybe you prefer to use a theme with fancy colors.
+
+The themes are provided separately and their installation and upgrade will be manual.
+To see the current themes available in this repository go to [ui-themes](ui-themes/).
+
+You can use any of them, but keep in mind if your terminal supports 24-bit or truecolor, if not, it will be better to use the themes for 8-bit colors
+
+### List installed themes
+```sh
+arradio themes
+```
+
+### Installing themes
+```sh
+curl -o ~/.arradio/ui-themes/molokai -s https://raw.githubusercontent.com/sepen/arradio/master/ui-themes/molokai
+```
+
+### Use a theme in UI mode:
+```sh
+arradio ui -t molokai
 ```
