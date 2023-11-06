@@ -4,9 +4,9 @@
 
 Listen to internet radio stations from the terminal.
 
-![Last Commit](https://img.shields.io/github/last-commit/sepen/k8kreator)
-![Repo Size](https://img.shields.io/github/repo-size/sepen/k8kreator)
-![Code Size](https://img.shields.io/github/languages/code-size/sepen/k8kreator)
+![Last Commit](https://img.shields.io/github/last-commit/sepen/arradio)
+![Repo Size](https://img.shields.io/github/repo-size/sepen/arradio)
+![Code Size](https://img.shields.io/github/languages/code-size/sepen/arradio)
 ![Proudly Written in Bash](https://img.shields.io/badge/written%20in-bash-ff69b4)
 
 

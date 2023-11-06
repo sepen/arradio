@@ -48,7 +48,7 @@ Available Commands:
   fdel [number]             Delete radio station from your favourites
   flist                     List favourites radio stations
   ui                        Start arradio in UI mode (User Interface)
-  themes-list               List installed UI themes
+  themes                    List installed UI themes
   help                      Show this help information
   version                   Show version information
 
@@ -520,7 +520,7 @@ while [ $1 ]; do
       arradio-ui
       break
       ;;
-    themes-list)
+    themes)
       arradio-ui-list-themes
       break
       ;;
