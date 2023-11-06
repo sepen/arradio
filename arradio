@@ -40,7 +40,7 @@ Usage:
 
 Available Commands:
   install                   Install arradio itself
-  update                    Update arradio itself
+  upgrade                   Upgrade arradio itself
   top500                    Get top 500 radio stations
   search [string]           Search for radio stations by keyword
   listen [number]           Listen to specified radio station
@@ -245,7 +245,7 @@ arradio-output-filter() {
 arradio-install() {
   arradio-check-deps "mkdir" "curl" "chmod"
   if [ -f ${ARRADIO_BINDIR}/arradio ]; then
-    arradio-msg-error "arradio previously installed. Please remove it or run 'update' command."
+    arradio-msg-error "arradio previously installed. Please remove it or run 'upgrade' command."
   fi
   arradio-msg-debug "Installing arradio to ${ARRADIO_HOME}"
   mkdir -p ${ARRADIO_HOME} ${ARRADIO_BINDIR} ${ARRADIO_DBDIR} ${ARRADIO_CACHEDIR} ${ARRADIO_FAVDIR} ${ARRADIO_TMPDIR}
@@ -256,10 +256,10 @@ arradio-install() {
   arradio-msg-info "  export PATH=\$HOME/.arradio/bin:\$PATH"
 }
 
-arradio-update() {
+arradio-upgrade() {
   arradio-check-deps "curl"
   if [ ! -f ${ARRADIO_BINDIR}/arradio ]; then
-    arradio-msg-error "Cannot update arradio. You need to install it first."
+    arradio-msg-error "Cannot upgrade arradio. You need to install it first."
   fi
   arradio-msg-debug "Updating ${ARRADIO_SRCDIR}"
   curl -fsSL ${ARRADIO_GITHUB_RAW} -o ${ARRADIO_BINDIR}/arradio && chmod +x ${ARRADIO_BINDIR}/arradio
@@ -488,8 +488,8 @@ while [ $1 ]; do
       arradio-install
       break
       ;;
-    update)
-      arradio-update
+    upgrade)
+      arradio-upgrade
       break
       ;;
     top500)
