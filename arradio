@@ -239,7 +239,7 @@ arradio-output-filter() {
 }
 
 # =============================================================================
-# INSTALL / UPDATE
+# INSTALL / UPGRADE
 # =============================================================================
 
 arradio-install() {
@@ -261,9 +261,9 @@ arradio-upgrade() {
   if [ ! -f ${ARRADIO_BINDIR}/arradio ]; then
     arradio-msg-error "Cannot upgrade arradio. You need to install it first."
   fi
-  arradio-msg-debug "Updating ${ARRADIO_SRCDIR}"
+  arradio-msg-debug "Upgrading ${ARRADIO_SRCDIR}"
   curl -fsSL ${ARRADIO_GITHUB_RAW} -o ${ARRADIO_BINDIR}/arradio && chmod +x ${ARRADIO_BINDIR}/arradio
-  arradio-msg-info "Updated successfully!"
+  arradio-msg-info "Upgraded successfully!"
 }
 
 # =============================================================================
