@@ -85,10 +85,11 @@ Available Commands:
   version                   Show version information
 
 Optional Flags:
-  -l, --limit [number]      Limit output lines (default: 20)
-  -o, --output [string]     Output list format simple or wide (default: simple)
-  -p, --player [string]     Command to play the streams. Default: arradio-player
-  -t, --theme [string]      UI theme (default: basic)
+  -l, --limit [number]      Limit output lines
+  -o, --output [string]     Output list format simple or wide
+  -p, --player [string]     Command to play the streams
+  -t, --theme [string]      UI theme
+  -b, --no-color            Do not colorize messages and output lists
   -n, --no-cache            Do not use cached resources
   -d, --debug               Enable debug messages
 ```
