@@ -1,5 +1,8 @@
+#!/usr/bin/env bash
+
 ui_theme_name="gruvbox"
-ui_theme_description="Theme based on morhetz/gruvbox"
+ui_theme_description="Retro groove color scheme based on morhetz/gruvbox"
+ui_theme_palette="24-bit"
 
 # Main text
 fg='fg:#EBDBB2'

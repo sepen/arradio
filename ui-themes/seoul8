@@ -1,5 +1,8 @@
+#!/usr/bin/env bash
+
 ui_theme_name="seoul8"
-ui_theme_description="Seoul256 light theme with 8-bit colors"
+ui_theme_description="256 color theme based on seoul"
+ui_theme_palette="8-bit"
 
 # Main text
 fg='fg:235'

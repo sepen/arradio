@@ -1,5 +1,8 @@
+#!/usr/bin/env bash
+
 ui_theme_name="seouldark"
-ui_theme_description="Theme based on junegunn/seoul256.vim (dark)"
+ui_theme_description="Dark theme based on junegunn/seoul256.vim"
+ui_theme_pallete="24-bit"
 
 # Main text
 fg='fg:#D9D9D9'

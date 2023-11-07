@@ -431,16 +431,19 @@ arradio-ui-set-theme() {
 
 arradio-ui-list-themes() {
   arradio-check-deps "find"
-  local ui_themes="$(find ${ARRADIO_UI_THEME_DIR} -depth 1 2>/dev/null)"
+  local ui_themes="$(find ${ARRADIO_UI_THEME_DIR} -mindepth 1 -maxdepth 1 2>/dev/null)"
   if [ -z "${ui_themes}" ]; then
-    arradio-msg-info "No UI themes found. You can install arradio themes from:"
-    arradio-msg-info "  https://github.com/sepen/arradio/tree/master/ui-themes/"
+    arradio-msg-info "No UI themes found. More information here:"
+    arradio-msg-info "  https://github.com/sepen/arradio#ui-themes"
   else
-    printf "%-20s %s\n" "THEME" "DESCRIPTION"
+    local msgprefix='\033[1m'
+    local msgsuffix='\033[0m'
+    [ ${ARRADIO_NOCOLOR} -eq 1 ] && msgprefix=''
+    printf "${msgprefix}%-10s  %8s  %s${msgsuffix}\n" "THEME" "PALETTE" "DESCRIPTION"
     for ui_theme in ${ui_themes[@]}; do
       source ${ui_theme}
-      if [ ! -z "${ui_theme_name}" ] && [ ! -z "${ui_theme_description}" ]; then
-        printf "%-20s %s\n" "${ui_theme_name}" "${ui_theme_description}"
+      if [ ! -z "${ui_theme_name}" ]; then
+        printf "%-10s  %8s  %s\n" "${ui_theme_name}" "${ui_theme_palette}" "${ui_theme_description}"
       fi
     done
   fi

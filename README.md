@@ -101,6 +101,7 @@ Optional Flags:
 Look for radio stations with the words _rock_ and _metal_ and limit the list to only 5 stations with wide output format:
 ```sh
 arradio search rock -l 5 -o wide
+
  STATION  GENRE               NAME                                    INFO
 99498012  Rock                ROCK ANTENNE                            Creedence Clearwater Revival - Bad moon rising
 99497966  Heavy Metal         ROCK ANTENNE Heavy Metal (Germany)      Nightwish - Amaranth
@@ -122,6 +123,7 @@ arradio fadd 99498012
 To list my favourites:
 ```sh
 arradio flist
+
  STATION  GENRE               NAME
 99498012  Rock                ROCK ANTENNE
 ```
@@ -141,19 +143,31 @@ arradio ui
 The themes are provided separately and their installation and upgrade will be manual.
 To see the current themes available in this repository go to [ui-themes](ui-themes/).
 
-You can use any of them, but keep in mind if your terminal supports 24-bit or truecolor, if not, it will be better to use the themes for 8-bit colors
+You can use any of them, but keep in mind if your terminal supports 24-bit truecolor, if not, it will be better to use the themes for 8-bit colors
 
-List installed themes
+
+### Installing themes
+
+This is an example about installing some color schemes:
 ```sh
+for theme in basic molokai gruvbox; do \
+curl -o ~/.arradio/ui-themes/$theme -fsSL https://raw.githubusercontent.com/sepen/arradio/master/ui-themes/$theme; done
+```
+
+To see your installed themes:
+```
 arradio themes
+
+THEME        PALETTE  DESCRIPTION
+molokai       24-bit  A color scheme for focusing based on tomasr/molokai
+gruvbox       24-bit  Retro groove color scheme based on morhetz/gruvbox
+basic          8-bit  Basic arradio UI theme designed for portability
 ```
 
-Installing themes
-```sh
-curl -o ~/.arradio/ui-themes/molokai -fsSL https://raw.githubusercontent.com/sepen/arradio/master/ui-themes/molokai
-```
+### Using themes
 
-Use a theme in UI mode:
+By default `arradio` will try to use what defined in ARRADIO_UI_THEME environment variable.
+To use another theme you should override this by doing something like:
 ```sh
-arradio ui -t molokai
+arradio ui -t gruvbox
 ```

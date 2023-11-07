@@ -1,5 +1,8 @@
+#!/usr/bin/env bash
+
 ui_theme_name="nord"
-ui_theme_description="Theme based on arcticicestudio/nord-vim"
+ui_theme_description="North-bluish theme based on arcticicestudio/nord-vim"
+ui_theme_palette="24-bit"
 
 # Main text
 fg='fg:#D8DEE9'

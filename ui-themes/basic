@@ -1,5 +1,8 @@
+#!/usr/bin/env bash
+
 ui_theme_name="basic"
-ui_theme_description="Default arradio UI theme in 8-bit for better terminal support"
+ui_theme_description="Basic arradio UI theme designed for portability"
+ui_theme_palette="8-bit"
 
 # Main text
 fg='fg:246'
