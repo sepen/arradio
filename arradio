@@ -190,6 +190,7 @@ arradio-get-station-url() {
 
 arradio-output-filter() {
   arradio-check-deps "cat" "xmllint" "grep" "sed" "head"
+  [ ${ARRADIO_NOCOLOR} -eq 0 ] && echo -ne '\033[1;37m'
   case ${ARRADIO_OUTPUT_FILTER} in
     simple)
       printf "%8s  %-18s  %s\n" "STATION" "GENRE" "NAME"
@@ -198,6 +199,7 @@ arradio-output-filter() {
       printf "%8s  %-18s  %-38s  %s\n" "STATION" "GENRE" "NAME" "INFO"
       ;;
   esac
+  [ ${ARRADIO_NOCOLOR} -eq 0 ] && echo -ne '\033[0m'
   cat - \
   | grep 'station name' \
   | while read xml_line; do
@@ -313,12 +315,15 @@ arradio-info() {
   if [ -z ${station_url} ]; then
     arradio-msg-error "station_url not found for station_id ${station_id}"
   fi
-  echo "Station: ${station_id}"
-  grep -e '^name:' ${db_file}  | sed 's|name: |   Name: |'
-  grep -e '^genre:' ${db_file} | sed 's|genre: |  Genre: |'
-  grep -e '^url:' ${db_file} | sed 's|url: |    URL: |'
-  grep -e '^br:' ${db_file}  | sed 's|br: |Bitrate: |'
-  grep -e '^info:' ${db_file} | sed 's|info: |\n|'
+  local station_name="$(grep '^name: ' ${db_file} 2>/dev/null | sed 's|name: ||')"
+  local station_genre="$(grep '^genre: ' ${db_file} 2>/dev/null | sed 's|genre: ||')"
+  local station_bitrate="$(grep '^br: ' ${db_file} 2>/dev/null | sed 's|br: ||')"
+  local station_info="$(grep '^info: ' ${db_file} 2>/dev/null | sed 's|info: ||')"
+  printf "%-8s  %s\n" "Station" "${station_id}"
+  printf "%-8s  %s\n" "Name" "${station_name}"
+  printf "%-8s  %s\n" "Genre" "${station_genre}"
+  [ ! -z "${station_bitrate}" ] && printf "%-8s  %s kbit/s\n" "Bitrate" "${station_bitrate}"
+  [ ! -z "${station_info}" ] && printf "%-8s  %s\n" "Info" "${station_info}"
 }
 
 # =============================================================================
