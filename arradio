@@ -44,6 +44,7 @@ Available Commands:
   top500                    Get top 500 radio stations
   search [string]           Search for radio stations by keyword
   listen [number]           Listen to specified radio station
+  info [number]             Get information for specified radio station
   fadd [number]             Add radio station to your favourites
   fdel [number]             Delete radio station from your favourites
   flist                     List favourites radio stations
@@ -301,18 +302,23 @@ arradio-listen() {
 # =============================================================================
 
 arradio-info() {
-  arradio-check-deps "grep" "sort"
+  arradio-check-deps "grep" "sed"
+  [ $# -lt 1 ] && arradio-print-help
   local station_id="$1"
+  local db_file="${ARRADIO_DBDIR}/${station_id}"
+  if [ ! -f ${db_file} ]; then
+    arradio-msg-error "station_id ${station_id} not found"
+  fi
   local station_url="$(arradio-get-station-url $station_id)"
   if [ -z ${station_url} ]; then
     arradio-msg-error "station_url not found for station_id ${station_id}"
   fi
-  echo "id: ${station_id}"
-  grep -e '^name:' ${ARRADIO_DBDIR}/${station_id}
-  grep -e '^genre:' ${ARRADIO_DBDIR}/${station_id}
-  grep -e '^url:' ${ARRADIO_DBDIR}/${station_id}
-  grep -e '^br:' ${ARRADIO_DBDIR}/${station_id}
-  grep -e '^info:' ${ARRADIO_DBDIR}/${station_id}
+  echo "Station: ${station_id}"
+  grep -e '^name:' ${db_file}  | sed 's|name: |   Name: |'
+  grep -e '^genre:' ${db_file} | sed 's|genre: |  Genre: |'
+  grep -e '^url:' ${db_file} | sed 's|url: |    URL: |'
+  grep -e '^br:' ${db_file}  | sed 's|br: |Bitrate: |'
+  grep -e '^info:' ${db_file} | sed 's|info: |\n|'
 }
 
 # =============================================================================
@@ -433,7 +439,7 @@ arradio-ui() {
     0.4[0-9].*)
       : | fzf \
         --no-extended --exact \
-        --layout=reverse --info=inline --cycle --no-mouse \
+        --layout=reverse --info=inline --cycle \
         --border=bold --border-label=" arradio v${ARRADIO_VERSION} " --border-label-pos=0 \
         --header-lines=1 --no-separator --padding=1 \
         --prompt "Favorites> " \
