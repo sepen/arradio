@@ -464,13 +464,13 @@ arradio-ui() {
         --preview 'arradio info {1}' \
         --preview-window 'down,33%,border,follow' \
         --header $'\nCTRL-F Favorites | CTRL-F Top Stations | ENTER To Play | +/- Favorites add/remove\n\n' \
-        --bind 'start:reload(arradio flist -b)+change-preview(arradio info {1})' \
+        --bind 'start:reload(arradio flist)+change-preview(arradio info {1})' \
         --bind 'enter:change-preview(arradio listen {1})' \
         --bind 'focus:change-preview(arradio info {1})' \
-        --bind 'ctrl-f:reload(arradio flist -b)+change-prompt(Favorites> )+change-preview(arradio info {1})' \
-        --bind 'ctrl-t:reload(arradio top500 -b)+change-prompt(Top500> )+change-preview(arradio info {1})' \
-        --bind '+:reload(arradio fadd {1}; arradio flist -b)+change-prompt(Favorites> )+change-preview(arradio info {1})' \
-        --bind '-:reload(arradio fdel {1}; arradio flist -b)+change-prompt(Favorites> )+change-preview(arradio info {1})'
+        --bind 'ctrl-f:reload(arradio flist)+change-prompt(Favorites> )+change-preview(arradio info {1})' \
+        --bind 'ctrl-t:reload(arradio top500)+change-prompt(Top500> )+change-preview(arradio info {1})' \
+        --bind '+:reload(arradio fadd {1}; arradio flist)+change-prompt(Favorites> )+change-preview(arradio info {1})' \
+        --bind '-:reload(arradio fdel {1}; arradio flist)+change-prompt(Favorites> )+change-preview(arradio info {1})'
       ;;
     *)
       : | arradio-flist | fzf \
@@ -483,10 +483,10 @@ arradio-ui() {
         --preview-window 'down' \
         --header $'\nCTRL-F Favorites | CTRL-T Top500 | +/- Favorites add/remove\n\n' \
         --bind 'enter:ignore' \
-        --bind 'ctrl-f:reload(arradio flist -b)' \
-        --bind 'ctrl-t:reload(arradio top500 -b)' \
-        --bind '+:reload(arradio fadd {1}; arradio flist -b)' \
-        --bind '-:reload(arradio fdel {1}; arradio flist -b)'
+        --bind 'ctrl-f:reload(arradio flist)' \
+        --bind 'ctrl-t:reload(arradio top500)' \
+        --bind '+:reload(arradio fadd {1}; arradio flist)' \
+        --bind '-:reload(arradio fdel {1}; arradio flist)'
       ;;
   esac
 }
