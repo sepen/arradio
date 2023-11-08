@@ -259,7 +259,7 @@ arradio-install() {
   mkdir -p ${ARRADIO_HOME} ${ARRADIO_BIN_DIR} ${ARRADIO_DB_DIR} ${ARRADIO_CACHE_DIR} ${ARRADIO_FAV_DIR} ${ARRADIO_TMP_DIR}
   curl -fsSL ${ARRADIO_GITHUB_RAW} -o ${ARRADIO_BIN_DIR}/arradio
   chmod +x ${ARRADIO_BIN_DIR}/arradio
-  arradio-msg-info "Installed successfully!"
+  arradio-msg-info "Installed successfully! $(${ARRADIO_BIN_DIR}/arradio version)"
   arradio-msg-info "IMPORTANT: To finish do you need to add binaries to your PATH as for example:"
   arradio-msg-info "  export PATH=\$HOME/.arradio/bin:\$PATH"
   exit 0
@@ -272,7 +272,7 @@ arradio-upgrade() {
   fi
   arradio-msg-debug "Upgrading ${ARRADIO_SRCDIR}"
   curl -fsSL ${ARRADIO_GITHUB_RAW} -o ${ARRADIO_BIN_DIR}/arradio && chmod +x ${ARRADIO_BIN_DIR}/arradio
-  arradio-msg-info "Upgraded successfully!"
+  arradio-msg-info "Upgraded successfully! $(${ARRADIO_BIN_DIR}/arradio version)"
   exit 0
 }
 
@@ -420,7 +420,7 @@ arradio-ui-set-theme() {
         esac
       fi
     done
-    # qremove last , char
+    # remove last , char
     ui_theme_color="${ui_theme_color%,*}"
     export FZF_DEFAULT_OPTS+=" --color=${ui_theme_color}"
   else
@@ -497,7 +497,7 @@ arradio-ui() {
 export LC_ALL=${LC_ALL:-C}
 export PATH=${ARRADIO_BIN_DIR}:${PATH}
 
-readonly ARRADIO_VERSION="0.2.0"
+readonly ARRADIO_VERSION="0.2.1"
 readonly ARRADIO_GITHUB_RAW="https://raw.githubusercontent.com/sepen/arradio/master/arradio"
 
 # Global variables
