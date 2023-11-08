@@ -138,7 +138,7 @@ arradio ui
 
 ## UI themes
 
-`arradio` can perfectly work in UI mode without any theme installed. It will use a basic black and white interface. But maybe you prefer to use a theme with fancy colors.
+`arradio` can perfectly work in UI mode without any theme installed. In this case it will use a black and white interface. But maybe you prefer to use a theme with fancy colors.
 
 The themes are provided separately and their installation and upgrade will be manual.
 To see the current themes available in this repository go to [ui-themes](ui-themes/).
@@ -150,7 +150,8 @@ You can use any of them, but keep in mind if your terminal supports 24-bit truec
 
 This is an example about installing some color schemes:
 ```sh
-for theme in basic molokai gruvbox; do \
+themes="basic molokai gruvbox"
+for theme in $themes; do \
 curl -o ~/.arradio/ui-themes/$theme -fsSL https://raw.githubusercontent.com/sepen/arradio/master/ui-themes/$theme; done
 ```
 

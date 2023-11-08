@@ -5,21 +5,21 @@ ui_theme_description="256 color theme based on nord"
 ui_theme_palette="8-bit"
 
 # Main text
-fg='fg:145'
+fg='fg:249'
 # Preview window text
-preview_fg='preview-fg:145'
+preview_fg='preview-fg:59'
 # Background
-bg='bg:235'
+bg='bg:234'
 # Preview window background
-preview_bg='preview-bg:235'
+preview_bg='preview-bg:234'
 # Highlighted substrings
-hl='hl:60'
+hl='hl:255'
 # Text (current line)
-fg_plus='fg+:255'
+fg_plus='fg+:7'
 # Background (current line)
 bg_plus='bg+:236'
 # Gutter on the left
-gutter='gutter:235'
+gutter='gutter:234'
 # Highlighted substrings (current line)
 hl_plus='hl+:67'
 # Info line (match counters)
@@ -47,4 +47,4 @@ marker='marker:67'
 # Streaming input indicator
 spinner='spinner:67'
 # Header
-header='header:59'
+header='header:242'
