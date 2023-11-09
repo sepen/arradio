@@ -81,8 +81,9 @@ Available Commands:
   flist                     List favourites radio stations
   ui                        Start arradio in UI mode (User Interface)
   themes                    List installed UI themes
-  help                      Show this help information
+  env                       Show environment variables
   version                   Show version information
+  help                      Show this help information
 
 Optional Flags:
   -l, --limit [number]      Limit output lines
@@ -94,7 +95,32 @@ Optional Flags:
   -d, --debug               Enable debug messages
 ```
 
----
+## Configuration
+
+The `arradio` config file, which defaults to `~/.arradio/config` has the following format:
+```config
+# this is a comment
+output_limit:   50
+output_filter:  simple
+player_cmd:     mpv --no-video
+ui_theme:       basic
+no_color:       0
+no_cache:       0
+debug:          0
+```
+NOTE: This file is not created by default, so if you need to make changes to the default values, consider creating this configuration file.
+
+Configuration values can come from several sources:
+
+- As an environment variable
+- As a value in the config file
+- As a command line optional flag
+
+The previous order also indicates the order of precedence to take. For example, a variable has a default value: `ARRADIO_UI_THEME=basic`.
+- This can be changed by using the environment variable: `export ARRADIO_UI_THEME=nord`
+- Then by the config value: `ui_theme: gruvbox`
+- And lastly it will always takes precedence what is passed through the command line: `--theme molokai  `
+
 
 ## Examples
 

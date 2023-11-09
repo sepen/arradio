@@ -33,6 +33,18 @@ arradio-print-version() {
   exit 0
 }
 
+arradio-print-env() {
+  arradio-check-deps "env" "grep" "sed"
+  local msgprefix='\033[1m'
+  local msgsuffix='\033[0m'
+  [ ${ARRADIO_NOCOLOR} -eq 1 ] && msgprefix='**'
+  printf "${msgprefix}%-40s  %s${msgsuffix}\n" "VARIABLE" "VALUE"
+  env |  grep '^ARRADIO' | sed 's|=| |' | while read variable value; do
+    printf "%-40s  %s\n" "${variable}" "${value}"
+  done
+  exit 0
+}
+
 arradio-print-help() {
   cat << __HELP__
 Usage:
@@ -50,8 +62,9 @@ Available Commands:
   flist                     List favourites radio stations
   ui                        Start arradio in UI mode (User Interface)
   themes                    List installed UI themes
-  help                      Show this help information
+  env                       Show environment variables
   version                   Show version information
+  help                      Show this help information
 
 Optional Flags:
   -l, --limit [number]      Limit output lines (default: $ARRADIO_OUTPUT_LIMIT)
@@ -65,7 +78,7 @@ __HELP__
   exit 0
 }
 
-arradio-set-flags() {
+arradio-parse-flags() {
   while [ $1 ]; do
     case $1 in
       -l|--limit)
@@ -92,6 +105,26 @@ arradio-set-flags() {
     esac
     shift
   done
+}
+
+arradio-parse-userconfig() {
+  arradio-check-deps "grep" "sed"
+  if [ -f ${ARRADIO_CONFIG_FILE} ]; then
+    local output_limit=$(grep '^output_limit:' ${ARRADIO_CONFIG_FILE} 2>/dev/null | sed 's|output_limit: *||')
+    local output_filter=$(grep '^output_filter:' ${ARRADIO_CONFIG_FILE} 2>/dev/null | sed 's|output_filter: *||')
+    local player_cmd=$(grep '^player_cmd:' ${ARRADIO_CONFIG_FILE} 2>/dev/null | sed 's|player_cmd: *||')
+    local ui_theme=$(grep '^ui_theme:' ${ARRADIO_CONFIG_FILE} 2>/dev/null | sed 's|ui_theme: *||')
+    local no_cache=$(grep '^no_cache:' ${ARRADIO_CONFIG_FILE} 2>/dev/null | sed 's|no_cache: *||')
+    local no_color=$(grep '^no_color:' ${ARRADIO_CONFIG_FILE} 2>/dev/null | sed 's|no_color: *||')
+    local debug=$(grep '^debug:' ${ARRADIO_CONFIG_FILE} 2>/dev/null | sed 's|debug: *||')
+    [ ! -z "${output_limit}" ] && ARRADIO_OUTPUT_LIMIT="${output_limit}"
+    [ ! -z "${output_filter}" ] && ARRADIO_OUTPUT_FILTER="${output_filter}"
+    [ ! -z "${player_cmd}" ] && ARRADIO_PLAYER_CMD="${player_cmd}"
+    [ ! -z "${ui_theme}" ] && ARRADIO_UI_THEME="${ui_theme}"
+    [ ! -z "${no_cache}" ] && ARRADIO_NOCACHE="${no_cache}"
+    [ ! -z "${no_color}" ] && ARRADIO_NOCOLOR="${no_color}"
+    [ ! -z "${debug}" ] && ARRADIO_DEBUG="${debug}"
+  fi
 }
 
 arradio-check-deps() {
@@ -501,8 +534,6 @@ readonly ARRADIO_VERSION="0.2.1"
 readonly ARRADIO_GITHUB_RAW="https://raw.githubusercontent.com/sepen/arradio/master/arradio"
 
 # Global variables
-export ARRADIO_NOCOLOR=${ARRADIO_NOCOLOR:-0}
-export ARRADIO_DEBUG=${ARRADIO_DEBUG:-0}
 export ARRADIO_HOME="${ARRADIO_HOME:-${HOME}/.arradio}"
 export ARRADIO_BIN_DIR="${ARRADIO_BIN_DIR:-${ARRADIO_HOME}/bin}"
 export ARRADIO_DB_DIR="${ARRADIO_DB_DIR:-${ARRADIO_HOME}/db}"
@@ -511,14 +542,17 @@ export ARRADIO_FAV_DIR="${ARRADIO_FAV_DIR:-${ARRADIO_HOME}/favorites}"
 export ARRADIO_UI_THEME_DIR="${ARRADIO_UI_THEME_DIR:-${ARRADIO_HOME}/ui-themes}"
 export ARRADIO_TMP_DIR="${ARRADIO_TMP_DIR:-${ARRADIO_HOME}/tmp}"
 export ARRADIO_TMP_FILE="${ARRADIO_TMP_DIR}/station"
+export ARRADIO_CONFIG_FILE="${ARRADIO_CONFIG_FILE:-${ARRADIO_HOME}/config}"
 
 # Global flags
-export ARRADIO_OUTPUT_LIMIT=${ARRADIO_OUTPUT_LIMIT:-20} # from 1 to 500
+export ARRADIO_OUTPUT_LIMIT=${ARRADIO_OUTPUT_LIMIT:-50} # 1 to 500
 export ARRADIO_OUTPUT_FILTER="${ARRADIO_OUTPUT_FILTER:-simple}"
 export ARRADIO_UI_THEME="${ARRADIO_UI_THEME:-basic}"
 export ARRADIO_PLAYER_CMD="arradio-player"
 export ARRADIO_FORCE_PLAYER_CMD="${ARRADIO_FORCE_PLAYER_CMD}"
 export ARRADIO_NOCACHE=${ARRADIO_NOCACHE:-0}
+export ARRADIO_NOCOLOR=${ARRADIO_NOCOLOR:-0}
+export ARRADIO_DEBUG=${ARRADIO_DEBUG:-0}
 
 # SHOUTcast
 readonly SHOUTCAST_API_ID="sh17tOUi_ezL61_A"
@@ -527,7 +561,9 @@ readonly SHOUTCAST_API_URL="http://api.shoutcast.com/legacy/"
 # Show help when no arguments given
 [ $# -eq 0 ] && arradio-print-help
 
-arradio-set-flags $@
+# Follow precedence order for values
+arradio-parse-userconfig
+arradio-parse-flags $@
 
 while [ $1 ]; do
   case $1 in
@@ -573,6 +609,10 @@ while [ $1 ]; do
       ;;
     themes)
       arradio-ui-list-themes
+      break
+      ;;
+    env)
+      arradio-print-env
       break
       ;;
     version)
