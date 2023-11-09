@@ -24,6 +24,7 @@ Listen to internet radio stations from the terminal.
 * [Installation](#installation)
 * [Upgrading arradio](#upgrading-arradio)
 * [Usage](#usage)
+  * [Configuration](#configuration)
   * [Examples](#examples)
 * [UI Mode](#ui-mode)
 * [UI Themes](#ui-themes)
@@ -174,9 +175,9 @@ You can use any of them, but keep in mind if your terminal supports 24-bit truec
 
 ### Installing themes
 
-This is an example about installing some color schemes:
+This is an example about installing some themes:
 ```sh
-themes="basic molokai gruvbox"
+themes="basic molokai gruvbox nord"
 for theme in $themes; do \
 curl -o ~/.arradio/ui-themes/$theme -fsSL https://raw.githubusercontent.com/sepen/arradio/master/ui-themes/$theme; done
 ```
@@ -193,8 +194,15 @@ basic          8-bit  Basic arradio UI theme designed for portability
 
 ### Using themes
 
-By default `arradio` will try to use what defined in ARRADIO_UI_THEME environment variable.
-To use another theme you should override this by doing something like:
+By default `arradio` will try to use what defined in _ARRADIO_UI_THEME_ environment variable.
+
+To use another theme you should override this by doing something like this:
 ```sh
 arradio ui -t gruvbox
+```
+
+Or set up a config file like this:
+```config
+# this is my favourite theme
+ui_theme: gruvbox
 ```
