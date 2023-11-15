@@ -172,6 +172,15 @@ To see the current themes available in this repository go to [ui-themes](ui-them
 
 You can use any of them, but keep in mind if your terminal supports 24-bit truecolor, if not, it will be better to use the themes for 8-bit colors
 
+| Name | Screenshot | Palette | Description |
+|------|------------|---------|-------------|
+| basic | <img src='https://user-images.githubusercontent.com/11802175/283218989-c880d89c-6e04-4e9d-a13e-f8f983241db7.png' height='25%' /> | 8-bit | Basic arradio UI theme designed for portability |
+| gruvbox | <img src='https://user-images.githubusercontent.com/11802175/283219015-c3435a75-1ca5-49c6-bbb3-fcca8738eff7.png' height='25%' /> | 24-bit | Retro groove color scheme based on morhetz/gruvbox |
+| molokai | <img src='https://user-images.githubusercontent.com/11802175/283219007-36ff52e3-1f5d-4e46-90fc-f803eb49d188.png' height='25%' /> | 24-bit | A color scheme for focusing based on tomasr/molokai |
+| nord | <img src='https://user-images.githubusercontent.com/11802175/283219010-0cb78f39-cad7-4949-890c-8e15c68eb197.png' height='25%' /> | 24-bit | North-bluish theme based on arcticicestudio/nord-vim |
+| purple | <img src='https://user-images.githubusercontent.com/11802175/283218996-50d6c815-d751-465f-9765-18c6f1c34d7b.png' height='25%' /> | 24-bit | Only want to see you in the purple rain |
+| seoul | <img src='https://user-images.githubusercontent.com/11802175/283219004-e6705984-fd13-44d8-bcfd-c29e5ced3ee5.png' height='25%' /> | 24-bit | Light theme based on junegunn/seoul256.vim |
+| seouldark | <img src='https://user-images.githubusercontent.com/11802175/283219001-b51d6b5b-5af5-4f59-b272-58f26c2eebff.png' height='25%' /> | 24-bit | Dark theme based on junegunn/seoul256.vim |
 
 ### Installing themes
 
