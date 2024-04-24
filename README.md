@@ -186,7 +186,7 @@ You can use any of them, but keep in mind if your terminal supports 24-bit truec
 
 This is an example about installing some themes:
 ```sh
-themes="basic molokai gruvbox nord"
+themes="basic molokai gruvbox"
 for theme in $themes; do \
 curl -o ~/.arradio/ui-themes/$theme -fsSL https://raw.githubusercontent.com/sepen/arradio/master/ui-themes/$theme; done
 ```

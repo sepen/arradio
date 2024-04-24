@@ -288,10 +288,15 @@ arradio-install() {
   if [ -f ${ARRADIO_BIN_DIR}/arradio ]; then
     arradio-msg-error "arradio previously installed. Please remove it or run 'upgrade' command."
   fi
-  arradio-msg-debug "Installing arradio to ${ARRADIO_HOME}"
-  mkdir -p ${ARRADIO_HOME} ${ARRADIO_BIN_DIR} ${ARRADIO_DB_DIR} ${ARRADIO_CACHE_DIR} ${ARRADIO_FAV_DIR} ${ARRADIO_TMP_DIR}
-  curl -fsSL ${ARRADIO_GITHUB_RAW} -o ${ARRADIO_BIN_DIR}/arradio
+  arradio-msg-debug "Installing arradio to ${ARRADIO_BIN_DIR}"
+  mkdir -p ${ARRADIO_BIN_DIR}
+  curl -fsSL ${ARRADIO_GITHUB_RAW}/arradio -o ${ARRADIO_BIN_DIR}/arradio
   chmod +x ${ARRADIO_BIN_DIR}/arradio
+  arradio-msg-debug "Installing default UI theme to ${ARRADIO_UI_THEME_DIR}"
+  mkdir -p ${ARRADIO_UI_THEME_DIR}
+  curl -fsSL ${ARRADIO_GITHUB_RAW}/ui-themes/basic -o ${ARRADIO_UI_THEME_DIR}/basic
+  arradio-msg-debug "Installing directories"
+  mkdir -p ${ARRADIO_DB_DIR} ${ARRADIO_CACHE_DIR} ${ARRADIO_FAV_DIR} ${ARRADIO_TMP_DIR}
   arradio-msg-info "Installed successfully! $(${ARRADIO_BIN_DIR}/arradio version)"
   arradio-msg-info "IMPORTANT: To finish do you need to add binaries to your PATH as for example:"
   arradio-msg-info "  export PATH=\$HOME/.arradio/bin:\$PATH"
@@ -303,8 +308,9 @@ arradio-upgrade() {
   if [ ! -f ${ARRADIO_BIN_DIR}/arradio ]; then
     arradio-msg-error "Cannot upgrade arradio. You need to install it first."
   fi
-  arradio-msg-debug "Upgrading ${ARRADIO_SRCDIR}"
-  curl -fsSL ${ARRADIO_GITHUB_RAW} -o ${ARRADIO_BIN_DIR}/arradio && chmod +x ${ARRADIO_BIN_DIR}/arradio
+  arradio-msg-debug "Upgrading $(${ARRADIO_BIN_DIR}/arradio version)"
+  curl -fsSL ${ARRADIO_GITHUB_RAW} -o ${ARRADIO_BIN_DIR}/arradio
+  chmod +x ${ARRADIO_BIN_DIR}/arradio
   arradio-msg-info "Upgraded successfully! $(${ARRADIO_BIN_DIR}/arradio version)"
   exit 0
 }
@@ -438,7 +444,7 @@ arradio-ui-set-theme() {
     for ui_theme_var in ${ui_theme_vars[@]}; do
       if [ ! -z ${ui_theme_var} ]; then
         case $(arradio-get-fzf-version) in
-          0.4[0-9].*)
+          0.4[0-9].*|0.5[0-9].*)
             ui_theme_color+="${!ui_theme_var},"
             ;;
           *)
@@ -490,7 +496,7 @@ arradio-ui() {
   arradio-check-deps "fzf"
   arradio-ui-set-theme
   case $(arradio-get-fzf-version) in
-    0.4[0-9].*)
+    0.4[0-9].*|0.5[0-9].*)
       : | fzf \
         --no-extended --exact \
         --layout=reverse --info=inline --cycle \
@@ -499,7 +505,7 @@ arradio-ui() {
         --prompt "Favorites> " \
         --preview 'arradio info {1}' \
         --preview-window 'down,33%,border,follow' \
-        --header $'\nCTRL-F Favorites | CTRL-F Top Stations | ENTER To Play | +/- Favorites add/remove\n\n' \
+        --header $'\nCTRL-F Favorites | CTRL-T Top Stations | ENTER To Play | +/- Favorites add/remove\n\n' \
         --bind 'start:reload(arradio flist)+change-preview(arradio info {1})' \
         --bind 'enter:change-preview(arradio listen {1})' \
         --bind 'focus:change-preview(arradio info {1})' \
@@ -517,7 +523,7 @@ arradio-ui() {
         --prompt "arradio> " \
         --preview 'arradio listen {1}' \
         --preview-window 'down' \
-        --header $'\nCTRL-F Favorites | CTRL-T Top500 | +/- Favorites add/remove\n\n' \
+        --header $'\nCTRL-F Favorites | CTRL-T Top Stations | +/- Favorites add/remove\n\n' \
         --bind 'enter:ignore' \
         --bind 'ctrl-f:reload(arradio flist)' \
         --bind 'ctrl-t:reload(arradio top500)' \
@@ -531,7 +537,7 @@ export LC_ALL=${LC_ALL:-C}
 export PATH=${ARRADIO_BIN_DIR}:${PATH}
 
 readonly ARRADIO_VERSION="0.2.1"
-readonly ARRADIO_GITHUB_RAW="https://raw.githubusercontent.com/sepen/arradio/master/arradio"
+readonly ARRADIO_GITHUB_RAW="https://raw.githubusercontent.com/sepen/arradio/master"
 
 # Global variables
 export ARRADIO_HOME="${ARRADIO_HOME:-${HOME}/.arradio}"
