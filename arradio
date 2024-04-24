@@ -279,6 +279,18 @@ arradio-output-filter() {
     done
 }
 
+arradio-check-favorites() {
+  arradio-check-deps "find"
+  if [ ! -d ${ARRADIO_FAV_DIR} ]; then
+    arradio-msg-error "Favorites directory not found. ${ARRADIO_FAV_DIR}"
+  fi
+  case $(find ${ARRADIO_FAV_DIR} -type d -empty) in
+    "${ARRADIO_FAV_DIR}")
+      arradio-msg-error "No favorites found. Please add some before."
+      ;;
+  esac
+}
+
 # =============================================================================
 # INSTALL / UPGRADE
 # =============================================================================
@@ -398,34 +410,33 @@ arradio-fdel() {
 
 arradio-flist() {
   arradio-check-deps "basename" "grep" "sed"
-  if [ -d ${ARRADIO_FAV_DIR} ]; then
-    local msgprefix='\033[1m'
-    local msgsuffix='\033[0m'
-    [ ${ARRADIO_NOCOLOR} -eq 1 ] && msgprefix=''
+  arradio-check-favorites
+  local msgprefix='\033[1m'
+  local msgsuffix='\033[0m'
+  [ ${ARRADIO_NOCOLOR} -eq 1 ] && msgprefix=''
+  case ${ARRADIO_OUTPUT_FILTER} in
+    simple)
+      printf "${msgprefix}%8s  %-18s  %s${msgsuffix}\n" "STATION" "GENRE" "NAME"
+      ;;
+    wide)
+      printf "${msgprefix}%8s  %-18s  %-38s  %s${msgsuffix}\n" "STATION" "GENRE" "NAME" "INFO"
+      ;;
+  esac
+  for fav_file in ${ARRADIO_FAV_DIR}/*; do
+    station_id="$(grep '^id:' ${fav_file} 2>/dev/null | sed 's|id: ||')"
+    station_genre="$(grep '^genre: ' ${fav_file} 2>/dev/null | sed 's|genre: ||')"
+    station_name="$(grep '^name: ' ${fav_file} 2>/dev/null | sed 's|name: ||')"
+    station_info="$(grep '^info: ' ${fav_file} 2>/dev/null | sed 's|info: ||')"
     case ${ARRADIO_OUTPUT_FILTER} in
       simple)
-        printf "${msgprefix}%8s  %-18s  %s${msgsuffix}\n" "STATION" "GENRE" "NAME"
+        printf "%8s  %-18s  %s\n" "${station_id}" "${station_genre}" "${station_name}"
         ;;
       wide)
-        printf "${msgprefix}%8s  %-18s  %-38s  %s${msgsuffix}\n" "STATION" "GENRE" "NAME" "INFO"
+        station_name=$(echo ${station_name} | head -c 38)
+        printf "%8s  %-18s  %-38s  %s\n" "${station_id}" "${station_genre}" "${station_name}" "${station_info}"
         ;;
     esac
-    for fav_file in ${ARRADIO_FAV_DIR}/*; do
-      station_id="$(grep '^id:' ${fav_file} 2>/dev/null | sed 's|id: ||')"
-      station_genre="$(grep '^genre: ' ${fav_file} 2>/dev/null | sed 's|genre: ||')"
-      station_name="$(grep '^name: ' ${fav_file} 2>/dev/null | sed 's|name: ||')"
-      station_info="$(grep '^info: ' ${fav_file} 2>/dev/null | sed 's|info: ||')"
-      case ${ARRADIO_OUTPUT_FILTER} in
-        simple)
-          printf "%8s  %-18s  %s\n" "${station_id}" "${station_genre}" "${station_name}"
-          ;;
-        wide)
-          station_name=$(echo ${station_name} | head -c 38)
-          printf "%8s  %-18s  %-38s  %s\n" "${station_id}" "${station_genre}" "${station_name}" "${station_info}"
-          ;;
-      esac
-    done
-  fi
+  done
 }
 
 # =============================================================================
