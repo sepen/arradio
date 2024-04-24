@@ -1,4 +1,4 @@
-# `arradio`
+# [arradio](/)
 
 Listen to internet radio stations from the terminal.
 
@@ -14,8 +14,8 @@ Listen to internet radio stations from the terminal.
 
 - Search radio stations from the [SHOUTcast](https://directory.shoutcast.com/) directory
 - Manage a list of favorite radio stations
-- Use multiple audio players ([mpv](https://mpv.io), [vlc](https://www.videolan.org), [ffplay](https://ffmpeg.org/), etc.) to play radio stations
-- Optional pseudo-user interface for terminal with color theme support.
+- Use multiple audio players like [arradio-player](https://github.com/sepen/arradio-player), [mpv](https://mpv.io), [vlc](https://www.videolan.org) and [ffplay](https://ffmpeg.org/) to play internet radio stations.
+- Optional UI ([fzf](https://github.com/junegunn/fzf) pseudo-user interface) with color theme support.
 
 
 ## Table of Contents
@@ -26,10 +26,13 @@ Listen to internet radio stations from the terminal.
 * [Usage](#usage)
   * [Configuration](#configuration)
   * [Examples](#examples)
+* [Favorites](#favorites)
+  * [Add a radio station](#add-a-radio-station)
+  * [Remove a radio station](#remove-a-radio-station)
 * [UI Mode](#ui-mode)
 * [UI Themes](#ui-themes)
-  * [Installing a theme](#installing-themes)
-  * [Create a new theme](#create-a-new-theme)
+  * [Installing themes](#installing-themes)
+  * [Select a theme](#select-a-theme)
 
 
 ## Requirements
@@ -38,35 +41,39 @@ Listen to internet radio stations from the terminal.
 - XML tools are required to parse URL responses from [SHOUTcast](https://directory.shoutcast.com/) directory
   - [xmllint](https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home)
 - External audio player. This program does not play URL streams directly, this is delegated to an external audio player that should be installed on the system. The following ones are detected automatically if installed.
+  - [arradio-player](https://github.com/sepen/arradio-player)
   - [mpv](https://mpv.io)
   - [vlc](https://www.videolan.org)
   - [ffplay](https://ffmpeg.org/)
-  - [arradio-player](https://github.com/sepen/arradio-player)
 - (optional) External command for the User Interface: [fzf](https://github.com/junegunn/fzf)
 
 
 
 ## Installation
 
-To install **arradio** paste that in a macOS Terminal or Linux shell prompt:
+To install [arradio](/) paste that in a macOS Terminal or Linux shell prompt:
 ```shell
 curl -fsSL https://raw.githubusercontent.com/sepen/arradio/master/arradio | bash -s install
 ```
 
-The one-liner command from above installs **arradio** to its default, `$HOME/.arradio` and will place some files under that prefix, so you'll need to set your PATH like this `export PATH=$HOME/.arradio/bin:$PATH`. \
-The installation explains what it will do, and you will see all that information. Consider adding this line to your _~/.bashrc_ or _~/.bash_profile_ or make sure to export this _PATH_ before running **arradio**. The installation explains what it will do. \
-The one-liner installation method found on **arradio** uses Bash. Notably, zsh, fish, tcsh and csh will not work.
+* The one-liner command from above installs [arradio](/) to its default `$HOME/.arradio`
+* It will place some files under that prefix, so you'll need to set your PATH like this `export PATH=$HOME/.arradio/bin:$PATH`
+* The installation explains what it will do, and you will see all that information. Consider adding this line to your _~/.bashrc_ or _~/.bash_profile_ or make sure to export this _PATH_ before running [arradio](/). The installation explains what it will do.
+* The one-liner installation method found on [arradio](/) uses Bash. Notably, zsh, fish, tcsh and csh will not work.
 
 
 ## Upgrading arradio
 
-`arradio` is being actively developed, and you might want to upgrade it once in a while. Please follow the instruction below:
+[arradio](/) is being actively developed, and you might want to upgrade it once in a while. Please follow the instruction below:
 ```shell
 arradio upgrade
 ```
 
+
 ## Usage
 ```
+arradio help
+
 Usage:
   arradio [command] <flags>
 
@@ -96,20 +103,21 @@ Optional Flags:
   -d, --debug               Enable debug messages
 ```
 
-## Configuration
+### Configuration
 
-The `arradio` config file, which defaults to `~/.arradio/config` has the following format:
+The config file, which defaults to `$HOME/.arradio/config` has the following format:
 ```config
-# this is a comment
-output_limit:   50
-output_filter:  simple
+# this is a comment line
 player_cmd:     mpv --no-video
-ui_theme:       basic
+ui_theme:       molokai8
+output_limit:   50
+output_filter:  wide
 no_color:       0
-no_cache:       0
+no_cache:       1
 debug:          0
+# this is another comment line
 ```
-NOTE: This file is not created by default, so if you need to make changes to the default values, consider creating this configuration file.
+NOTE: This file is not created by default, so if you need to make changes to the default values, consider creating this configuration file. You can grab an example from [here](arradio.config)
 
 Configuration values can come from several sources:
 
@@ -117,55 +125,105 @@ Configuration values can come from several sources:
 - As a value in the config file
 - As a command line optional flag
 
-The previous order also indicates the order of precedence to take. For example, a variable has a default value: `ARRADIO_UI_THEME=basic`.
-- This can be changed by using the environment variable: `export ARRADIO_UI_THEME=nord`
-- Then by the config value: `ui_theme: gruvbox`
-- And lastly it will always takes precedence what is passed through the command line: `--theme molokai  `
+The previous order also indicates the order of precedence to take.
+For example, to override the default UI theme:
+```sh
+export ARRADIO_UI_THEME=nord
+arradio ui
+```
+
+The above can be also override by setting a value in the config file ([arradio.config](arradio.config)):
+```config
+ui_theme: gruvbox
+```
+
+Lastly all from above can be override as an optional flag through the command line:
+```sh
+arradio ui --theme molokai
+```
 
 
-## Examples
+
+### Examples
 
 Look for radio stations with the words _rock_ and _metal_ and limit the list to only 5 stations with wide output format:
 ```sh
-arradio search rock -l 5 -o wide
+arradio search rock -l 5
 
- STATION  GENRE               NAME                                    INFO
-99498012  Rock                ROCK ANTENNE                            Creedence Clearwater Revival - Bad moon rising
-99497966  Heavy Metal         ROCK ANTENNE Heavy Metal (Germany)      Nightwish - Amaranth
-99497948  80s                 ANTENNE BAYERN 80er Hits                Donna Summer - On the radio
- 1542116  Pop                 POWERHITZ.COM - THE OFFICEMIX - The Be  
-99497950  Rock                ANTENNE BAYERN Classic Rock             Steve Miller Band - Abracadabra
+ STATION  GENRE               NAME
+99498012  Rock                ROCK ANTENNE
+99497966  Heavy Metal         ROCK ANTENNE Heavy Metal (Germany)
+99497948  80s                 ANTENNE BAYERN 80er Hits
+ 1542116  Pop                 POWERHITZ.COM - THE OFFICEMIX
+99497950  Rock                ANTENNE BAYERN Classic Rock
 ```
 
-To play a radio station the use the STATION id from first column:
+To play a radio station then use the `station-id` from first column:
 ```sh
 arradio listen 99498012
 ```
 
-To add it to my favorites:
-```sh
-arradio fadd 99498012
-```
+## Favorites
+
+By default this is empty but you can mantain a list of favorite radio stations.
 
 To list my favourites:
 ```sh
 arradio flist
-
  STATION  GENRE               NAME
-99498012  Rock                ROCK ANTENNE
+ 1210771  Funk                GENERATION SOUL DISCO FUNK RADIO [HD]
+ 1340450  Misc                AlienWare
+ 1528122  Jazz                JAZZGROOVE.org - The Jazz Groove
+ 1862204  Drum and Bass       DnBRadio.com
+99497996  Pop                 ANTENNE BAYERN
+99500354  Classic Rock        Classic Rock 109 - True Classic Rock!
+99504568  Downtempo           Nordic Lodge - Copenhagen
+99518870  Salsa               RADIO PANAMERICANA WEB
+99540705  Rock                PureRock.US - America Pure Rock
+99568323  Dance               Dance Wave Retro!
+99571797  Techno              Minimal Mix Radio
+99576960  Reggae              Roots Legacy Radio
+```
+
+### Add a radio station
+
+To add a radio station you can do it in several ways.
+
+Maybe you already have a `station-id` from a previous search. In this case just run something like:
+```sh
+arradio fadd 99498012
+```
+
+You can also add radio stations from other locations. All you need is a valid stream URL. For that just create a new file under favorites directory like that:
+```sh
+cat > $HOME/.arradio/favorites/0000001 << __EOF__
+id: 0000001
+br: 128
+genre: Rock
+info: Groovy Music Sanctuary (https://www.downtunedmag.com)
+url: http://195.242.237.14:8020/stream
+__EOF__
+```
+
+### Remove a radio station
+
+Similar to adding a `station-id` to favorites, you can remove it with something like:
+```sh
+arradio fdel 99498012
 ```
 
 
 ## UI mode
 
-`arradio` can run in pseudo-terminal User Interface mode. You just need to have _fzf_ installed and then you can run the following command to start UI mode:
+[arradio](/) can run in pseudo-terminal User Interface mode. You just need to have _fzf_ installed and then you can run the following command to start UI mode:
 ```sh
 arradio ui
 ```
 
+
 ## UI themes
 
-`arradio` can perfectly work in UI mode without any theme installed. In this case it will use a black and white interface. But maybe you prefer to use a theme with fancy colors.
+[arradio](/) can perfectly work in UI mode without any theme installed. In this case it will use a black and white interface. But maybe you prefer to use a theme with fancy colors.
 
 The themes are provided separately and their installation and upgrade will be manual.
 To see the current themes available in this repository go to [ui-themes](ui-themes/).
@@ -186,9 +244,10 @@ You can use any of them, but keep in mind if your terminal supports 24-bit truec
 
 This is an example about installing some themes:
 ```sh
-themes="basic molokai gruvbox"
-for theme in $themes; do \
-curl -o ~/.arradio/ui-themes/$theme -fsSL https://raw.githubusercontent.com/sepen/arradio/master/ui-themes/$theme; done
+url="https://raw.githubusercontent.com/sepen/arradio/master/ui-themes"
+themes="molokai gruvbox nord"
+cd ~/.arradio/ui-themes
+for theme in $themes; do curl -fsSL -O $url/$theme; done
 ```
 
 To see your installed themes:
@@ -198,12 +257,13 @@ arradio themes
 THEME        PALETTE  DESCRIPTION
 molokai       24-bit  A color scheme for focusing based on tomasr/molokai
 gruvbox       24-bit  Retro groove color scheme based on morhetz/gruvbox
+nord          24-bit  North-bluish theme based on arcticicestudio/nord-vim
 basic          8-bit  Basic arradio UI theme designed for portability
 ```
 
-### Using themes
+### Select a theme
 
-By default `arradio` will try to use what defined in _ARRADIO_UI_THEME_ environment variable.
+By default [arradio](/) will try to use what defined in `ARRADIO_UI_THEME` environment variable.
 
 To use another theme you should override this by doing something like this:
 ```sh
@@ -212,6 +272,5 @@ arradio ui -t gruvbox
 
 Or set up a config file like this:
 ```config
-# this is my favourite theme
 ui_theme: gruvbox
 ```
