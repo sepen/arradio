@@ -523,7 +523,7 @@ arradio-ui() {
         --bind 'enter:change-preview(arradio listen {1})' \
         --bind 'focus:change-preview(arradio info {1})' \
         --bind 'ctrl-f:reload(arradio flist)+change-prompt(Favorites> )+change-preview(arradio info {1})' \
-        --bind 'ctrl-t:reload(arradio top500)+change-prompt(Top500> )+change-preview(arradio info {1})' \
+        --bind 'ctrl-t:reload(arradio top500)+change-prompt(Top Stations> )+change-preview(arradio info {1})' \
         --bind '+:reload(arradio fadd {1}; arradio flist)+change-prompt(Favorites> )+change-preview(arradio info {1})' \
         --bind '-:reload(arradio fdel {1}; arradio flist)+change-prompt(Favorites> )+change-preview(arradio info {1})'
       ;;
