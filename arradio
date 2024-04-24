@@ -119,7 +119,7 @@ arradio-parse-userconfig() {
     local debug=$(grep '^debug:' ${ARRADIO_CONFIG_FILE} 2>/dev/null | sed 's|debug: *||')
     [ ! -z "${output_limit}" ] && ARRADIO_OUTPUT_LIMIT="${output_limit}"
     [ ! -z "${output_filter}" ] && ARRADIO_OUTPUT_FILTER="${output_filter}"
-    [ ! -z "${player_cmd}" ] && ARRADIO_PLAYER_CMD="${player_cmd}"
+    [ ! -z "${player_cmd}" ] && ARRADIO_PLAYER_CMD="${player_cmd}" ARRADIO_FORCE_PLAYER_CMD="${player_cmd}"
     [ ! -z "${ui_theme}" ] && ARRADIO_UI_THEME="${ui_theme}"
     [ ! -z "${no_cache}" ] && ARRADIO_NOCACHE="${no_cache}"
     [ ! -z "${no_color}" ] && ARRADIO_NOCOLOR="${no_color}"
