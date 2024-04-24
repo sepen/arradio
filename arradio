@@ -304,7 +304,7 @@ arradio-install() {
   mkdir -p ${ARRADIO_BIN_DIR}
   curl -fsSL ${ARRADIO_GITHUB_RAW}/arradio -o ${ARRADIO_BIN_DIR}/arradio
   chmod +x ${ARRADIO_BIN_DIR}/arradio
-  arradio-msg-debug "Installing default UI theme to ${ARRADIO_UI_THEME_DIR}"
+  arradio-msg-debug "Installing default UI theme"
   mkdir -p ${ARRADIO_UI_THEME_DIR}
   curl -fsSL ${ARRADIO_GITHUB_RAW}/ui-themes/basic -o ${ARRADIO_UI_THEME_DIR}/basic
   arradio-msg-debug "Installing directories"
@@ -321,8 +321,10 @@ arradio-upgrade() {
     arradio-msg-error "Cannot upgrade arradio. You need to install it first."
   fi
   arradio-msg-debug "Upgrading $(${ARRADIO_BIN_DIR}/arradio version)"
-  curl -fsSL ${ARRADIO_GITHUB_RAW} -o ${ARRADIO_BIN_DIR}/arradio
+  curl -fsSL ${ARRADIO_GITHUB_RAW}/arradio -o ${ARRADIO_BIN_DIR}/arradio
   chmod +x ${ARRADIO_BIN_DIR}/arradio
+  arradio-msg-debug "Upgrading default UI theme"
+  curl -fsSL ${ARRADIO_GITHUB_RAW}/ui-themes/basic -o ${ARRADIO_UI_THEME_DIR}/basic
   arradio-msg-info "Upgraded successfully! $(${ARRADIO_BIN_DIR}/arradio version)"
   exit 0
 }
@@ -547,7 +549,7 @@ arradio-ui() {
 export LC_ALL=${LC_ALL:-C}
 export PATH=${ARRADIO_BIN_DIR}:${PATH}
 
-readonly ARRADIO_VERSION="0.2.1"
+readonly ARRADIO_VERSION="0.2.2"
 readonly ARRADIO_GITHUB_RAW="https://raw.githubusercontent.com/sepen/arradio/master"
 
 # Global variables
