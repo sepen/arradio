@@ -132,7 +132,7 @@ export ARRADIO_UI_THEME=nord
 arradio ui
 ```
 
-The above can be also override by setting a value in the config file ([arradio.config](arradio.config)):
+The above can be also override by setting a value in the config file:
 ```config
 ui_theme: gruvbox
 ```
@@ -246,8 +246,9 @@ This is an example about installing some themes:
 ```sh
 url="https://raw.githubusercontent.com/sepen/arradio/master/ui-themes"
 themes="molokai gruvbox nord"
-cd ~/.arradio/ui-themes
+cd $HOME/.arradio/ui-themes
 for theme in $themes; do curl -fsSL -O $url/$theme; done
+cd -
 ```
 
 To see your installed themes:
