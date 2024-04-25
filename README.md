@@ -79,24 +79,24 @@ Usage:
 Available Commands:
   install                   Install arradio itself
   upgrade                   Upgrade arradio itself
-  top500                    Get top 500 radio stations
+  toplist                   List top radio stations
   search [string]           Search for radio stations by keyword
   listen [number]           Listen to specified radio station
   info [number]             Get information for specified radio station
   fadd [number]             Add radio station to your favourites
   fdel [number]             Delete radio station from your favourites
   flist                     List favourites radio stations
-  ui                        Start arradio in UI mode (User Interface)
+  ui                        Start arradio in UI mode (fzf required)
   themes                    List installed UI themes
   env                       Show environment variables
   version                   Show version information
   help                      Show this help information
 
 Optional Flags:
-  -l, --limit [number]      Limit output lines
-  -o, --output [string]     Output list format simple or wide
-  -p, --player [string]     Command to play the streams
-  -t, --theme [string]      UI theme
+  -l, --limit [number]      Limit output lines (default: 50)
+  -o, --output [string]     Output list format simple or wide (default: simple)
+  -p, --player [string]     Command to play the streams (default: arradio-player)
+  -t, --theme [string]      UI theme (default: basic)
   -b, --no-color            Do not colorize messages and output lists
   -n, --no-cache            Do not use cached resources
   -d, --debug               Enable debug messages

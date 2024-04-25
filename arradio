@@ -53,14 +53,14 @@ Usage:
 Available Commands:
   install                   Install arradio itself
   upgrade                   Upgrade arradio itself
-  top500                    Get top 500 radio stations
+  toplist                   List top radio stations
   search [string]           Search for radio stations by keyword
   listen [number]           Listen to specified radio station
   info [number]             Get information for specified radio station
   fadd [number]             Add radio station to your favourites
   fdel [number]             Delete radio station from your favourites
   flist                     List favourites radio stations
-  ui                        Start arradio in UI mode (User Interface)
+  ui                        Start arradio in UI mode (fzf required)
   themes                    List installed UI themes
   env                       Show environment variables
   version                   Show version information
@@ -69,7 +69,7 @@ Available Commands:
 Optional Flags:
   -l, --limit [number]      Limit output lines (default: $ARRADIO_OUTPUT_LIMIT)
   -o, --output [string]     Output list format simple or wide (default: $ARRADIO_OUTPUT_FILTER)
-  -p, --player [string]     Command to play the streams. Default: $ARRADIO_PLAYER_CMD
+  -p, --player [string]     Command to play the streams (default: $ARRADIO_PLAYER_CMD)
   -t, --theme [string]      UI theme (default: $ARRADIO_UI_THEME)
   -b, --no-color            Do not colorize messages and output lists
   -n, --no-cache            Do not use cached resources
@@ -188,7 +188,7 @@ arradio-get-fzf-version() {
   fi
 }
 
-arradio-make-api-request()  {
+arradio-shoutcast-api-request()  {
   arradio-check-deps "cut" "curl" "xmllint"
   local md5_command="$(arradio-get-md5-command)"
   [ $# -lt 1 ] && arradio-print-help
@@ -225,7 +225,7 @@ arradio-get-station-url() {
   fi
 }
 
-arradio-output-filter() {
+arradio-shoutcast-output-filter() {
   arradio-check-deps "cat" "xmllint" "grep" "sed" "head"
   local msgprefix='\033[1m'
   local msgsuffix='\033[0m'
@@ -333,15 +333,15 @@ arradio-upgrade() {
 # SHOUTcast (see: http://wiki.winamp.com/wiki/SHOUTcast_Radio_Directory_API)
 # =============================================================================
 
-arradio-top500() {
-  arradio-make-api-request "${SHOUTCAST_API_URL}Top500?k=${SHOUTCAST_API_ID}&limit=${ARRADIO_OUTPUT_LIMIT}" \
-  | arradio-output-filter
+arradio-shoutcast-toplist() {
+  arradio-shoutcast-api-request "${SHOUTCAST_API_URL}Top500?k=${SHOUTCAST_API_ID}&limit=${ARRADIO_OUTPUT_LIMIT}" \
+  | arradio-shoutcast-output-filter
 }
 
-arradio-search() {
+arradio-shoutcast-search() {
   [ $# -lt 1 ] && arradio-print-help
-  arradio-make-api-request "${SHOUTCAST_API_URL}stationsearch?search=$1&k=${SHOUTCAST_API_ID}&limit=${ARRADIO_OUTPUT_LIMIT}" \
-  | arradio-output-filter
+  arradio-shoutcast-api-request "${SHOUTCAST_API_URL}stationsearch?search=$1&k=${SHOUTCAST_API_ID}&limit=${ARRADIO_OUTPUT_LIMIT}" \
+  | arradio-shoutcast-output-filter
 }
 
 # =============================================================================
@@ -523,7 +523,7 @@ arradio-ui() {
         --bind 'enter:change-preview(arradio listen {1})' \
         --bind 'focus:change-preview(arradio info {1})' \
         --bind 'ctrl-f:reload(arradio flist)+change-prompt(Favorites> )+change-preview(arradio info {1})' \
-        --bind 'ctrl-t:reload(arradio top500)+change-prompt(Top Stations> )+change-preview(arradio info {1})' \
+        --bind 'ctrl-t:reload(arradio toplist)+change-prompt(Top Stations> )+change-preview(arradio info {1})' \
         --bind '+:reload(arradio fadd {1}; arradio flist)+change-prompt(Favorites> )+change-preview(arradio info {1})' \
         --bind '-:reload(arradio fdel {1}; arradio flist)+change-prompt(Favorites> )+change-preview(arradio info {1})'
       ;;
@@ -539,7 +539,7 @@ arradio-ui() {
         --header $'\nCTRL-F Favorites | CTRL-T Top Stations | +/- Favorites add/remove\n\n' \
         --bind 'enter:ignore' \
         --bind 'ctrl-f:reload(arradio flist)' \
-        --bind 'ctrl-t:reload(arradio top500)' \
+        --bind 'ctrl-t:reload(arradio toplist)' \
         --bind '+:reload(arradio fadd {1}; arradio flist)' \
         --bind '-:reload(arradio fdel {1}; arradio flist)'
       ;;
@@ -594,8 +594,8 @@ while [ $1 ]; do
       arradio-upgrade
       break
       ;;
-    top500)
-      arradio-top500
+    toplist)
+      arradio-shoutcast-toplist
       break
       ;;
     search)
