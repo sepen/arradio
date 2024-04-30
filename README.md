@@ -12,6 +12,7 @@ Listen to internet radio stations from the terminal.
 ## Features
 
 - Search radio stations from the [SHOUTcast](https://directory.shoutcast.com/) directory
+- List top radio stations from the [SHOUTcast](https://directory.shoutcast.com/) and [SomaFM](https://somafm.com) directories
 - Manage a list of favorite radio stations
 - Use multiple audio players like [arradio-player](https://github.com/sepen/arradio-player), [mpv](https://mpv.io), [vlc](https://www.videolan.org) and [ffplay](https://ffmpeg.org/) to play internet radio stations.
 - Optional UI ([fzf](https://github.com/junegunn/fzf) pseudo-user interface) with color theme support.
@@ -37,7 +38,7 @@ Listen to internet radio stations from the terminal.
 ## Requirements
 
 - Common tools found on most UNIX systems: (_bash_, _cut_, _grep_, _sed_, _head_, _cat_)
-- XML tools are required to parse URL responses from [SHOUTcast](https://directory.shoutcast.com/) directory
+- XML tools are required to parse URL responses from [SHOUTcast](https://directory.shoutcast.com/) and [SomaFM](https://somafm.com) directories
   - [xmllint](https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home)
 - External audio player. This program does not play URL streams directly, this is delegated to an external audio player that should be installed on the system. The following ones are detected automatically if installed.
   - [arradio-player](https://github.com/sepen/arradio-player)
@@ -79,12 +80,13 @@ Usage:
 Available Commands:
   install                   Install arradio itself
   upgrade                   Upgrade arradio itself
-  toplist                   List top radio stations
+  toplist-shoutcast         List top radio stations from the SHOUTcast directory
+  toplist-somafm            List top radio stations from the SomaFM directory
   search [string]           Search for radio stations by keyword
-  listen [number]           Listen to specified radio station
-  info [number]             Get information for specified radio station
-  fadd [number]             Add radio station to your favourites
-  fdel [number]             Delete radio station from your favourites
+  listen [station-id]       Listen to specified radio station
+  info [station-id]         Get information for specified radio station
+  fadd [station-id]         Add radio station to your favourites
+  fdel [station-id]         Delete radio station from your favourites
   flist                     List favourites radio stations
   ui                        Start arradio in UI mode (fzf required)
   themes                    List installed UI themes
@@ -195,8 +197,8 @@ arradio fadd 99498012
 
 You can also add radio stations from other locations. All you need is a valid stream URL. For that just create a new file under favorites directory like that:
 ```sh
-cat > $HOME/.arradio/favorites/0000001 << __EOF__
-id: 0000001
+cat > $HOME/.arradio/favorites/downtuned << __EOF__
+id: downtuned
 br: 128
 genre: Rock
 info: Groovy Music Sanctuary (https://www.downtunedmag.com)
