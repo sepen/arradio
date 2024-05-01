@@ -356,7 +356,7 @@ arradio-shoutcast-search() {
 # =============================================================================
 
 arradio-somafm-api-request() {
-  arradio-check-deps "curl" "xmllint" "grep" "sed" "tr"
+  arradio-check-deps "cut" "curl" "xmllint" "grep" "sed" "tr"
   local md5_command="$(arradio-get-md5-command)"
   [ $# -lt 1 ] && arradio-print-help
   local request_url="$1"
@@ -657,7 +657,7 @@ arradio-ui() {
 export LC_ALL=${LC_ALL:-C}
 export PATH=${ARRADIO_BIN_DIR}:${PATH}
 
-readonly ARRADIO_VERSION="0.2.2"
+readonly ARRADIO_VERSION="0.3.0"
 readonly ARRADIO_GITHUB_RAW="https://raw.githubusercontent.com/sepen/arradio/master"
 
 # Global variables
@@ -684,8 +684,7 @@ export ARRADIO_DEBUG=${ARRADIO_DEBUG:-0}
 # SHOUTcast
 readonly SHOUTCAST_API_ID="sh17tOUi_ezL61_A"
 readonly SHOUTCAST_API_URL="http://api.shoutcast.com/legacy/"
-
-# SOMAfm
+# SomaFM
 readonly SOMAFM_API_URL="https://somafm.com/channels.xml"
 
 # Show help when no arguments given

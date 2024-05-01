@@ -11,8 +11,7 @@ Listen to internet radio stations from the terminal.
 
 ## Features
 
-- Search radio stations from the [SHOUTcast](https://directory.shoutcast.com/) directory
-- List top radio stations from the [SHOUTcast](https://directory.shoutcast.com/) and [SomaFM](https://somafm.com) directories
+- Listen radio stations from the [SHOUTcast](https://directory.shoutcast.com/) and [SomaFM](https://somafm.com) directories
 - Manage a list of favorite radio stations
 - Use multiple audio players like [arradio-player](https://github.com/sepen/arradio-player), [mpv](https://mpv.io), [vlc](https://www.videolan.org) and [ffplay](https://ffmpeg.org/) to play internet radio stations.
 - Optional UI ([fzf](https://github.com/junegunn/fzf) pseudo-user interface) with color theme support.
@@ -171,6 +170,7 @@ By default this is empty but you can mantain a list of favorite radio stations.
 To list my favourites:
 ```sh
 arradio flist
+
  STATION  GENRE               NAME
  1210771  Funk                GENERATION SOUL DISCO FUNK RADIO [HD]
  1340450  Misc                AlienWare
