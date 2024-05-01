@@ -7,7 +7,7 @@ Listen to internet radio stations from the terminal.
 ![Code Size](https://img.shields.io/github/languages/code-size/sepen/arradio)
 ![Proudly Written in Bash](https://img.shields.io/badge/written%20in-bash-ff69b4)
 
-<img width="80%" alt="image" src="https://github.com/sepen/arradio/assets/11802175/a1606404-228c-4603-8f4b-f5cdea7943bc">
+<img width="80%" alt="image" src="https://github.com/sepen/arradio/assets/11802175/8b107785-021f-418e-a304-9772198b23cf">
 
 ## Features
 
