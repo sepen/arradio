@@ -293,10 +293,10 @@ arradio-shoutcast-output-filter() {
   [ ${ARRADIO_NOCOLOR} -eq 1 ] && msgprefix=''
   case ${ARRADIO_OUTPUT_FILTER} in
     simple)
-      printf "${msgprefix}%14s  %-28s  %s${msgsuffix}\n" "STATION" "GENRE" "NAME"
+      printf "${msgprefix}%-14s  %-40s  %-28s${msgsuffix}\n" "STATION" "NAME" "GENRE"
       ;;
     wide)
-      printf "${msgprefix}%14s  %-28s  %-40s  %s${msgsuffix}\n" "STATION" "GENRE" "NAME" "INFO"
+      printf "${msgprefix}%-14s  %-40s  %-28s  %s${msgsuffix}\n" "STATION" "NAME" "GENRE" "INFO"
       ;;
   esac
   cat - \
@@ -326,15 +326,14 @@ arradio-shoutcast-output-filter() {
           -e 's|\&amp;|\&|g' > ${db_file}
       fi
       station_genre="$(grep '^genre: ' ${db_file} 2>/dev/null | sed 's|genre: ||')"
-      station_name="$(grep '^name: ' ${db_file} 2>/dev/null | sed 's|name: ||')"
+      station_name="$(grep '^name: ' ${db_file} 2>/dev/null | sed 's|name: ||' | head -c 40)"
       station_info="$(grep '^info: ' ${db_file} 2>/dev/null | sed 's|info: ||')"
       case ${ARRADIO_OUTPUT_FILTER} in
         simple)
-          printf "%14s  %-28s  %s\n" "${station_id}" "${station_genre}" "${station_name:-'NO NAME'}"
+          printf "%-14s  %-40s  %-28s\n" "${station_id}" "${station_name:-'none'}" "${station_genre:-'none'}"
           ;;
         wide)
-          station_name=$(echo ${station_name} | head -c 38)
-          printf "%14s  %-28s  %-40s  %s\n" "${station_id}" "${station_genre}" "${station_name:-'NO NAME'}" "${station_info}"
+          printf "%-14s  %-40s  %-28s  %s\n" "${station_id}" "${station_name:-'none'}" "${station_genre:-'none'}" "${station_info:-'none'}"
           ;;
       esac
     done
@@ -383,10 +382,10 @@ arradio-somafm-output-filter() {
   [ ${ARRADIO_NOCOLOR} -eq 1 ] && msgprefix=''
   case ${ARRADIO_OUTPUT_FILTER} in
     simple)
-      printf "${msgprefix}%14s  %-28s  %s${msgsuffix}\n" "STATION" "GENRE" "NAME"
+      printf "${msgprefix}%-14s  %-40s  %-28s${msgsuffix}\n" "STATION" "NAME" "GENRE"
       ;;
     wide)
-      printf "${msgprefix}%14s  %-28s  %-40s  %s${msgsuffix}\n" "STATION" "GENRE" "NAME" "INFO"
+      printf "${msgprefix}%-14s  %-40s  %-28s  %s${msgsuffix}\n" "STATION" "NAME" "GENRE" "INFO"
       ;;
   esac
   cat - \
@@ -409,15 +408,14 @@ arradio-somafm-output-filter() {
           -e 's|\&amp;|\&|g' > ${db_file}
       fi
       station_genre="$(grep '^genre: ' ${db_file} 2>/dev/null | sed 's|genre: ||')"
-      station_name="$(grep '^name: ' ${db_file} 2>/dev/null | sed 's|name: ||')"
+      station_name="$(grep '^name: ' ${db_file} 2>/dev/null | sed 's|name: ||' | head -c 40)"
       station_info="$(grep '^info: ' ${db_file} 2>/dev/null | sed 's|info: ||')"
       case ${ARRADIO_OUTPUT_FILTER} in
         simple)
-          printf "%14s  %-28s  %s\n" "${station_id}" "${station_genre}" "${station_name:-'NO NAME'}"
+          printf "%-14s  %-40s  %-28s\n" "${station_id}" "${station_name:-'none'}" "${station_genre:-'none'}"
           ;;
         wide)
-          station_name=$(echo ${station_name} | head -c 38)
-          printf "%14s  %-28s  %-40s  %s\n" "${station_id}" "${station_genre}" "${station_name:-'NO NAME'}" "${station_info}"
+          printf "%-14s  %-40s  %-28s  %s\n" "${station_id}" "${station_name:-'none'}" "${station_genre:-'none'}" "${station_info:-'none'}"
           ;;
       esac
     done
@@ -514,31 +512,30 @@ arradio-fdel() {
 }
 
 arradio-flist() {
-  arradio-check-deps "basename" "grep" "sed"
+  arradio-check-deps "basename" "grep" "sed" "head"
   arradio-check-favorites
   local msgprefix='\033[1m'
   local msgsuffix='\033[0m'
   [ ${ARRADIO_NOCOLOR} -eq 1 ] && msgprefix=''
   case ${ARRADIO_OUTPUT_FILTER} in
     simple)
-      printf "${msgprefix}%14s  %-28s  %s${msgsuffix}\n" "STATION" "GENRE" "NAME"
+      printf "${msgprefix}%-14s  %-40s  %-28s${msgsuffix}\n" "STATION" "NAME" "GENRE"
       ;;
     wide)
-      printf "${msgprefix}%14s  %-28s  %-40s  %s${msgsuffix}\n" "STATION" "GENRE" "NAME" "INFO"
+      printf "${msgprefix}%-14s  %-40s  %-28s  %s${msgsuffix}\n" "STATION" "NAME" "GENRE" "INFO"
       ;;
   esac
   for fav_file in ${ARRADIO_FAV_DIR}/*; do
     station_id="$(grep '^id:' ${fav_file} 2>/dev/null | sed 's|id: ||')"
     station_genre="$(grep '^genre: ' ${fav_file} 2>/dev/null | sed 's|genre: ||')"
-    station_name="$(grep '^name: ' ${fav_file} 2>/dev/null | sed 's|name: ||')"
+    station_name="$(grep '^name: ' ${fav_file} 2>/dev/null | sed 's|name: ||' | head -c 40)"
     station_info="$(grep '^info: ' ${fav_file} 2>/dev/null | sed 's|info: ||')"
     case ${ARRADIO_OUTPUT_FILTER} in
       simple)
-        printf "%14s  %-28s  %s\n" "${station_id}" "${station_genre}" "${station_name:-'NO NAME'}"
+        printf "%-14s  %-40s  %-28s\n" "${station_id}" "${station_name:-'none'}" "${station_genre:-'none'}"
         ;;
       wide)
-        station_name=$(echo ${station_name} | head -c 38)
-        printf "%14s  %-28s  %-40s  %s\n" "${station_id}" "${station_genre}" "${station_name:-'NO NAME'}" "${station_info}"
+        printf "%-14s  %-40s  %-28s  %s\n" "${station_id}" "${station_name:-'none'}" "${station_genre:-'none'}" "${station_info:-'none'}"
         ;;
     esac
   done
