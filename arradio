@@ -9,7 +9,7 @@ arradio-msg-debug() {
   local msgsuffix='\033[0m'
   if [ ${ARRADIO_DEBUG} -eq 1 ]; then
     [ ${ARRADIO_NOCOLOR} -eq 1 ] && msgprefix='[debug]'
-    echo -e "${msgprefix}${msgsuffix} $@"
+    echo -e "${msgprefix}${msgsuffix} $*"
   fi
 }
 
@@ -17,14 +17,14 @@ arradio-msg-info() {
   local msgprefix='\033[0;32m**'
   local msgsuffix='\033[0m'
   [ ${ARRADIO_NOCOLOR} -eq 1 ] && msgprefix='**'
-  echo -e "${msgprefix}${msgsuffix} $@"
+  echo -e "${msgprefix}${msgsuffix} $*"
 }
 
 arradio-msg-error() {
   local msgprefix='\033[1;31m**'
   local msgsuffix='\033[0m'
   [ ${ARRADIO_NOCOLOR} -eq 1 ] && msgprefix='[error]'
-  echo -e "${msgprefix}${msgsuffix} $@" 2>&1
+  echo -e "${msgprefix}${msgsuffix} $*" 2>&1
   exit 1
 }
 
@@ -55,6 +55,7 @@ Available Commands:
   upgrade                   Upgrade arradio itself
   toplist-shoutcast         List top radio stations from the SHOUTcast directory
   toplist-somafm            List top radio stations from the SomaFM directory
+  toplist-iptv            List top radio stations from the IPTV directory
   search [string]           Search for radio stations by keyword
   listen [station-id]       Listen to specified radio station
   info [station-id]         Get information for specified radio station
@@ -118,6 +119,7 @@ arradio-parse-userconfig() {
     local no_cache=$(grep '^no_cache:' ${ARRADIO_CONFIG_FILE} 2>/dev/null | sed 's|no_cache: *||')
     local no_color=$(grep '^no_color:' ${ARRADIO_CONFIG_FILE} 2>/dev/null | sed 's|no_color: *||')
     local debug=$(grep '^debug:' ${ARRADIO_CONFIG_FILE} 2>/dev/null | sed 's|debug: *||')
+    local iptv_url=$(grep '^iptv_url:' ${ARRADIO_CONFIG_FILE} 2>/dev/null | sed 's|iptv_url: *||')
     [ ! -z "${output_limit}" ] && ARRADIO_OUTPUT_LIMIT="${output_limit}"
     [ ! -z "${output_filter}" ] && ARRADIO_OUTPUT_FILTER="${output_filter}"
     [ ! -z "${player_cmd}" ] && ARRADIO_PLAYER_CMD="${player_cmd}" ARRADIO_FORCE_PLAYER_CMD="${player_cmd}"
@@ -125,11 +127,12 @@ arradio-parse-userconfig() {
     [ ! -z "${no_cache}" ] && ARRADIO_NOCACHE="${no_cache}"
     [ ! -z "${no_color}" ] && ARRADIO_NOCOLOR="${no_color}"
     [ ! -z "${debug}" ] && ARRADIO_DEBUG="${debug}"
+    [ ! -z "${iptv_url}" ] && ARRADIO_IPTV_URL="${iptv_url}"
   fi
 }
 
 arradio-check-deps() {
-  for dep in $@; do
+  for dep in "$@"; do
     # Search for the given executable in PATH (avoids a dependency on the `which` command)
     if ! type -P $dep >/dev/null 2>&1; then
       arradio-msg-error "Dependency '$dep' not found."
@@ -189,8 +192,14 @@ arradio-get-fzf-version() {
   fi
 }
 
+## Get the station URL from the database or favorites
+## If not found then make a request to the SHOUTcast API
 arradio-get-station-url() {
-  arradio-check-deps "grep" "sed" "curl" "grep"
+  arradio-check-deps "grep" "sed" "curl"
+  # Check if the required environment variables are set
+  [ -z ${ARRADIO_FAV_DIR} ] && arradio-msg-error "ARRADIO_FAV_DIR is not set"
+  [ -z ${ARRADIO_DB_DIR} ] && arradio-msg-error "ARRADIO_DB_DIR is not set"
+  [ -z ${ARRADIO_TMP_DIR} ] && arradio-msg-error "ARRADIO_TMP_DIR is not set"
   [ $# -lt 1 ] && arradio-print-help
   local station_id="$1" station_url=
   local fav_file="${ARRADIO_FAV_DIR}/${station_id}"
@@ -222,7 +231,7 @@ arradio-check-favorites() {
   fi
   case $(find ${ARRADIO_FAV_DIR} -type d -empty) in
     "${ARRADIO_FAV_DIR}")
-      arradio-msg-error "No favorites found. Please add some before."
+      arradio-msg-error "No favorites found. Please add some first."
       ;;
   esac
 }
@@ -433,11 +442,103 @@ arradio-somafm-search() {
 }
 
 # =============================================================================
+# IPTV
+# =============================================================================
+
+arradio-iptv-api-request() {
+  arradio-check-deps "curl" "cut" "grep" "cat"
+  local md5_command="$(arradio-get-md5-command)"
+  [ $# -lt 1 ] && arradio-print-help
+  local request_url="$1"
+  local cache_name="$(echo "${request_url}" | ${md5_command} | cut -d' ' -f1)"
+  local cache_file="${ARRADIO_CACHE_DIR}/${cache_name}"
+  # store the response to cache
+  if [ ${ARRADIO_NOCACHE} -eq 1 ] || [ ! -f "${cache_file}" ]; then
+    arradio-msg-debug "Caching file for request url ${request_url}"
+    curl -s "${request_url}" -o ${ARRADIO_TMP_FILE}
+    grep -e '^#EXTINF:' -e '^http' ${ARRADIO_TMP_FILE} \
+    | sed 's|^http|url=http|' \
+    | tr '\n' ' ' \
+    | sed 's|#EXTINF:|\n|g' | sed 1d > "${cache_file}"
+   fi
+   # output from cache
+   cat "${cache_file}"
+ }
+
+arradio-iptv-output-filter() {
+  arradio-check-deps "cat" "sed" "cut"
+  local msgprefix='\033[1m'
+  local msgsuffix='\033[0m'
+  [ ${ARRADIO_NOCOLOR} -eq 1 ] && msgprefix=''
+  case ${ARRADIO_OUTPUT_FILTER} in
+    simple)
+      printf "${msgprefix}%-38s  %s${msgsuffix}\n" "STATION" "NAME"
+      ;;
+    wide)
+      printf "${msgprefix}%-38s  %-42s  %-s${msgsuffix}\n" "STATION" "NAME" "INFO"
+      ;;
+  esac
+  cat - \
+  | while read station_line; do
+      station_url="$(echo ${station_line} | sed 's|.* url=||')"
+      station_id=
+      #if echo ${station_line} | grep -q 'id='; then
+      #  station_id="$(echo ${station_line} | cut -d'"' -f2 | sed 's|.*id=||')"
+      #fi
+      station_name="$(echo ${station_line} | cut -d',' -f2 | sed 's| url=.*||')"
+      station_info="${station_name}"
+      if [ -z "$station_id" ]; then
+        if [ -n "$station_name" ]; then
+          station_id="$(echo $station_name | sed 's| ||g' | tr '[A-Z]' '[a-z]')"
+        else
+          continue
+        fi
+      fi
+      echo "station_id | $station_id" >> cache.log
+      echo "station_name | $station_name" >> cache.log
+      echo >> cache.log
+      db_file="${ARRADIO_DB_DIR}/${station_id}"
+      if [ ${ARRADIO_NOCACHE} -eq 1 ] || [ ! -f "${db_file}" ]; then
+          echo "id: ${station_id}" > ${db_file}
+          echo "name: ${station_name}" >> ${db_file}
+          echo "info: ${station_info}" >> ${db_file}
+          echo "genre: iptv" >> ${db_file}
+          echo "url: ${station_url}" >> ${db_file}
+      fi
+      case ${ARRADIO_OUTPUT_FILTER} in
+        simple)
+          printf "%-38s  %-s\n" "${station_id}" "${station_name:-'NO NAME'}"
+          ;;
+        wide)
+          station_name=$(echo ${station_name} | head -c 42)
+          printf "%-38s  %-42s  %-s\n" "${station_id}" "${station_name:-'NO NAME'}" "${station_info}"
+          ;;
+      esac
+    done
+}
+
+arradio-iptv-toplist() {
+  arradio-iptv-api-request "${ARRADIO_IPTV_URL}" \
+  | arradio-iptv-output-filter | sed ${ARRADIO_OUTPUT_LIMIT}q
+}
+
+arradio-iptv-search() {
+  arradio-check-deps "sed" "grep"
+  [ $# -lt 1 ] && arradio-print-help
+  arradio-iptv-toplist | sed 1d | grep -i $1
+}
+
+
+# =============================================================================
 # SEARCH
 # =============================================================================
 arradio-search() {
   arradio-check-deps "sed"
-  ( arradio-shoutcast-search $1; arradio-somafm-search $1 ) |  sed ${ARRADIO_OUTPUT_LIMIT}q
+  (
+    arradio-shoutcast-search $1
+    arradio-somafm-search $1
+    arradio-iptv-search $1
+  ) | sed ${ARRADIO_OUTPUT_LIMIT}q
 }
 
 # =============================================================================
@@ -554,7 +655,7 @@ arradio-ui-set-theme() {
   )
   if [ -f ${ARRADIO_UI_THEME_DIR}/${ARRADIO_UI_THEME} ]; then
     source ${ARRADIO_UI_THEME_DIR}/${ARRADIO_UI_THEME}
-    for ui_theme_var in ${ui_theme_vars[@]}; do
+    for ui_theme_var in "${ui_theme_vars[@]}"; do
       if [ ! -z ${ui_theme_var} ]; then
         case $(arradio-get-fzf-version) in
           0.4[0-9].*|0.5[0-9].*)
@@ -592,7 +693,7 @@ arradio-ui-list-themes() {
     local msgsuffix='\033[0m'
     [ ${ARRADIO_NOCOLOR} -eq 1 ] && msgprefix=''
     printf "${msgprefix}%-10s  %8s  %s${msgsuffix}\n" "THEME" "PALETTE" "DESCRIPTION"
-    for ui_theme in ${ui_themes[@]}; do
+    for ui_theme in "${ui_themes[@]}"; do
       source ${ui_theme}
       if [ ! -z "${ui_theme_name}" ]; then
         printf "%-10s  %8s  %s\n" "${ui_theme_name}" "${ui_theme_palette}" "${ui_theme_description}"
@@ -621,11 +722,12 @@ arradio-ui() {
         --prompt "arradio> " \
         --preview 'arradio listen {1} -p "${ARRADIO_PLAYER_CMD}"' \
         --preview-window 'down' \
-        --header $'\nCTRL-F Favorites | CTRL-T SHOUTcast | CTRL-Y SomaFM | ENTER To Play | +/- Favorites add/remove\n\n' \
+        --header $'\n[ Ctrl-F Favorites | Ctrl-T SHOUTcast | Ctrl-Y SomaFM | Ctrl-U IPTV ]\n[ ENTER to play | +/- add/del to Favorites ]\n\n' \
         --bind 'enter:ignore' \
         --bind 'ctrl-f:reload(arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})' \
         --bind 'ctrl-t:reload(arradio toplist-shoutcast -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})' \
-        --bind 'ctrl-y:reload(arradio toplist-shoutcast -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})' \
+        --bind 'ctrl-y:reload(arradio toplist-somafm -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})' \
+        --bind 'ctrl-u:reload(arradio toplist-iptv -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})' \
         --bind '+:reload(arradio fadd {1}; arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})' \
         --bind '-:reload(arradio fdel {1}; arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})'
       ;;
@@ -638,13 +740,14 @@ arradio-ui() {
         --prompt "Favorites> " \
         --preview 'arradio info {1}' \
         --preview-window 'down,33%,border,follow' \
-        --header $'\nCTRL-F Favorites | CTRL-T SHOUTcast | CTRL-Y SomaFM | ENTER To Play | +/- Favorites add/remove\n\n' \
+        --header $'\n[ Ctrl-F Favorites | Ctrl-T SHOUTcast | Ctrl-Y SomaFM | Ctrl-U IPTV ]\n[ ENTER to play | +/- add/del to Favorites ]\n\n' \
         --bind 'start:reload(arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})+change-preview(arradio info {1})' \
         --bind 'enter:change-preview(arradio listen {1} -p "${ARRADIO_PLAYER_CMD}")' \
         --bind 'focus:change-preview(arradio info {1})' \
         --bind 'ctrl-f:reload(arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})+change-prompt(Favorites> )+change-preview(arradio info {1})' \
         --bind 'ctrl-t:reload(arradio toplist-shoutcast -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})+change-prompt(SHOUTcast> )+change-preview(arradio info {1})' \
         --bind 'ctrl-y:reload(arradio toplist-somafm -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})+change-prompt(SomaFM> )+change-preview(arradio info {1})' \
+        --bind 'ctrl-u:reload(arradio toplist-iptv -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})+change-prompt(IPTV> )+change-preview(arradio info {1})' \
         --bind '+:reload(arradio fadd {1}; arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})+change-prompt(Favorites> )+change-preview(arradio info {1})' \
         --bind '-:reload(arradio fdel {1}; arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})+change-prompt(Favorites> )+change-preview(arradio info {1})'
       ;;
@@ -654,7 +757,7 @@ arradio-ui() {
 export LC_ALL=${LC_ALL:-C}
 export PATH=${ARRADIO_BIN_DIR}:${PATH}
 
-readonly ARRADIO_VERSION="0.3.0"
+readonly ARRADIO_VERSION="0.4.0"
 readonly ARRADIO_GITHUB_RAW="https://raw.githubusercontent.com/sepen/arradio/master"
 
 # Global variables
@@ -677,10 +780,12 @@ export ARRADIO_FORCE_PLAYER_CMD="${ARRADIO_FORCE_PLAYER_CMD}"
 export ARRADIO_NOCACHE=${ARRADIO_NOCACHE:-0}
 export ARRADIO_NOCOLOR=${ARRADIO_NOCOLOR:-0}
 export ARRADIO_DEBUG=${ARRADIO_DEBUG:-0}
+export ARRADIO_IPTV_URL=${ARRADIO_IPTV_URL:-https://iptv-org.github.io/iptv/index.m3u}
 
 # SHOUTcast
 readonly SHOUTCAST_API_ID="sh17tOUi_ezL61_A"
 readonly SHOUTCAST_API_URL="http://api.shoutcast.com/legacy/"
+
 # SomaFM
 readonly SOMAFM_API_URL="https://somafm.com/channels.xml"
 
@@ -707,6 +812,10 @@ while [ $1 ]; do
       ;;
     toplist-somafm)
       arradio-somafm-toplist
+      break
+      ;;
+    toplist-iptv)
+      arradio-iptv-toplist
       break
       ;;
     search)
