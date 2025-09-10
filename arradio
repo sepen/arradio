@@ -63,7 +63,7 @@ arradio-msg-error() {
 }
 
 arradio-print-version() {
-  printf "arradio v %s\n" "${ARRADIO_VERSION}"
+  printf "arradio v%s\n" "${ARRADIO_VERSION}"
   exit 0
 }
 
