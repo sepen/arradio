@@ -1,6 +1,6 @@
 # [arradio](/)
 
-Listen to internet radio stations from the terminal.
+Fetch and play internet radio stations directly from the command line
 
 ![Last Commit](https://img.shields.io/github/last-commit/sepen/arradio)
 ![Repo Size](https://img.shields.io/github/repo-size/sepen/arradio)
@@ -11,10 +11,11 @@ Listen to internet radio stations from the terminal.
 
 ## Features
 
-- Listen radio stations from the [SHOUTcast](https://directory.shoutcast.com/) and [SomaFM](https://somafm.com) directories
-- Manage a list of favorite radio stations
+- Play radio stations from the [SHOUTcast](https://directory.shoutcast.com/) and [SomaFM](https://somafm.com) directories.
+- Manage a list of favorite radio stations.
 - Use multiple audio players like [arradio-player](https://github.com/sepen/arradio-player), [mpv](https://mpv.io), [vlc](https://www.videolan.org) and [ffplay](https://ffmpeg.org/) to play internet radio stations.
 - Optional UI ([fzf](https://github.com/junegunn/fzf) pseudo-user interface) with color theme support.
+- **IPTV support** for playing TV streams from M3U playlists.
 
 
 ## Table of Contents
@@ -76,46 +77,46 @@ arradio help
 Usage:
   arradio [command] <flags>
 
-Available Commands:
-  install                   Install arradio itself
-  upgrade                   Upgrade arradio itself
-  toplist-shoutcast         List top radio stations from the SHOUTcast directory
-  toplist-somafm            List top radio stations from the SomaFM directory
-  search [string]           Search for radio stations by keyword
-  listen [station-id]       Listen to specified radio station
-  info [station-id]         Get information for specified radio station
-  fadd [station-id]         Add radio station to your favourites
-  fdel [station-id]         Delete radio station from your favourites
-  flist                     List favourites radio stations
-  ui                        Start arradio in UI mode (fzf required)
-  themes                    List installed UI themes
-  env                       Show environment variables
-  version                   Show version information
-  help                      Show this help information
+Commands:
+  install                  Install arradio itself
+  upgrade                  Upgrade arradio itself
+  list                     List top streams (enabled services only)
+  search [string]          Search across enabled services
+  play [stream-id]         Play to specified stream
+  info [stream-id]         Show info for a stream
+  fadd [stream-id]         Add to favorites
+  fdel [stream-id]         Remove from favorites
+  flist                    List favorites
+  ui                       Start UI (fzf required)
+  themes                   List installed UI themes
+  env                      Show environment variables
+  version                  Show version
+  help                     Show this help
 
-Optional Flags:
-  -l, --limit [number]      Limit output lines (default: 50)
-  -o, --output [string]     Output list format simple or wide (default: simple)
-  -p, --player [string]     Command to play the streams (default: arradio-player)
-  -t, --theme [string]      UI theme (default: basic)
-  -b, --no-color            Do not colorize messages and output lists
-  -n, --no-cache            Do not use cached resources
-  -d, --debug               Enable debug messages
+Flags:
+  -s, --services [csv]     Limit services (shoutcast,somafm,iptv)
+  -l, --limit [num]        Output limit (default: 50)
+  -o, --output [fmt]       Format simple|wide (default: simple)
+  -p, --player [cmd]       Player command (default: mpv)
+  -t, --theme  [name]      UI theme (default: gruvbox)
+  -b, --no-color           Disable colors
+  -n, --no-cache           Disable cache
+  -d, --debug              Debug messages
 ```
 
 ### Configuration
 
 The config file, which defaults to `$HOME/.arradio/config` has the following format:
 ```config
-# this is a comment line
+# ~/.arradio/config
+
 player_cmd:     mpv --no-video
-ui_theme:       molokai8
-output_limit:   50
+ui_theme:       gruvbox
+output_limit:   100
 output_filter:  wide
 no_color:       0
 no_cache:       1
 debug:          0
-# this is another comment line
 ```
 NOTE: This file is not created by default, so if you need to make changes to the default values, consider creating this configuration file. You can grab an example from [here](arradio.config)
 
@@ -134,7 +135,7 @@ arradio ui
 
 The above can be also override by setting a value in the config file:
 ```config
-ui_theme: gruvbox
+ui_theme: purple
 ```
 
 Lastly all from above can be override as an optional flag through the command line:
@@ -142,7 +143,24 @@ Lastly all from above can be override as an optional flag through the command li
 arradio ui --theme molokai
 ```
 
+### IPTV Support
 
+IPTV support in **arradio** is controlled by the `enable_iptv` option in your config file (`~/.arradio/config`).
+When enabled, the UI lists IPTV streams as another “service” (like SHOUTcast or SomaFM).
+
+It expects **M3U playlists** (or compatible formats), which **arradio** parses to present channels.
+Playback is handled by your configured player (`player_cmd`, e.g., `mpv`, `vlc`, etc) but make sure your `player_cmd` **does not include options that disable video output** (such as `--no-video`), otherwise IPTV channels won’t show video correctly.  
+
+
+Example configuration enabling IPTV and pointing to an M3U playlist:
+```config
+# ~/.arradio/config
+
+player_cmd:    mpv
+output_limit:  500
+enable_iptv:   1
+iptv_url:      https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/master/streams/es.m3u
+```
 
 ### Examples
 
@@ -158,9 +176,9 @@ arradio search rock -l 5
 99497950  Rock                ANTENNE BAYERN Classic Rock
 ```
 
-To play a radio station then use the `station-id` from first column:
+To play a radio station then use the `stream-id` from first column:
 ```sh
-arradio listen 99498012
+arradio play 99498012
 ```
 
 ## Favorites
@@ -190,7 +208,7 @@ arradio flist
 
 To add a radio station you can do it in several ways.
 
-Maybe you already have a `station-id` from a previous search. In this case just run something like:
+Maybe you already have a `stream-id` from a previous search. In this case just run something like:
 ```sh
 arradio fadd 99498012
 ```
@@ -208,7 +226,7 @@ __EOF__
 
 ### Remove a radio station
 
-Similar to adding a `station-id` to favorites, you can remove it with something like:
+Similar to adding a `stream-id` to favorites, you can remove it with something like:
 ```sh
 arradio fdel 99498012
 ```
