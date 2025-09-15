@@ -7,7 +7,7 @@ Fetch and play internet radio stations directly from the command line
 ![Code Size](https://img.shields.io/github/languages/code-size/sepen/arradio)
 ![Proudly Written in Bash](https://img.shields.io/badge/written%20in-bash-ff69b4)
 
-<img width="80%" alt="image" src="https://github.com/sepen/arradio/assets/11802175/8b107785-021f-418e-a304-9772198b23cf">
+<img width="80%" alt="arradio v0.5.1" src="https://github.com/user-attachments/assets/afe67a77-67a6-409d-a049-35bdc7accfc1">
 
 ## Features
 
