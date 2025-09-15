@@ -73,7 +73,6 @@ arradio upgrade
 ## Usage
 ```sh
 arradio help
-
 Usage:
   arradio [command] <flags>
 
@@ -88,7 +87,7 @@ Commands:
   fdel [stream-id]         Remove from favorites
   flist                    List favorites
   ui                       Start UI (fzf required)
-  themes                   List installed UI themes
+  tlist                    List installed UI themes
   env                      Show environment variables
   version                  Show version
   help                     Show this help
@@ -98,7 +97,7 @@ Flags:
   -l, --limit [num]        Output limit (default: 50)
   -o, --output [fmt]       Format simple|wide (default: simple)
   -p, --player [cmd]       Player command (default: mpv)
-  -t, --theme  [name]      UI theme (default: gruvbox)
+  -t, --theme  [name]      UI theme (default: basic)
   -b, --no-color           Disable colors
   -n, --no-cache           Disable cache
   -d, --debug              Debug messages
@@ -106,17 +105,18 @@ Flags:
 
 ### Configuration
 
-The config file, which defaults to `$HOME/.arradio/config` has the following format:
+The configuration file, by default located at `$HOME/.arradio/config`, uses a simple `variable: value` format.
+Lines starting with `#` are treated as comments.
+
+Example:
 ```yaml
 # ~/.arradio/config
 
-player_cmd:     mpv --no-video
-ui_theme:       gruvbox
-output_limit:   100
-output_filter:  wide
-no_color:       0
-no_cache:       1
-debug:          0
+player_cmd:     mpv --no-video    # Command used to play streams  
+ui_theme:       retrowave         # Name of the UI theme 
+output_limit:   200               # Maximum number of results to display  
+output_filter:  wide              # Filter type for output  
+no_cache:       1                 # Disable caching when set to 1 
 ```
 NOTE: This file is not created by default, so if you need to make changes to the default values, consider creating this configuration file. You can grab an example from [here](arradio.config)
 
