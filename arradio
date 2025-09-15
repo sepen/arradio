@@ -3,7 +3,7 @@
 # =============================================================================
 # CONFIG / CONSTANTS
 # =============================================================================
-readonly ARRADIO_VERSION="0.5.0"
+readonly ARRADIO_VERSION="0.5.1"
 readonly ARRADIO_GITHUB_RAW="https://raw.githubusercontent.com/sepen/arradio/master"
 
 # APIs and URLs
@@ -94,7 +94,7 @@ Commands:
   fdel [stream-id]         Remove from favorites
   flist                    List favorites
   ui                       Start UI (fzf required)
-  themes                   List installed UI themes
+  tlist                    List installed UI themes
   env                      Show environment variables
   version                  Show version
   help                     Show this help
@@ -212,7 +212,7 @@ arradio-load-config() {
 arradio-get-md5-command() {
   if type -P md5sum >/dev/null 2>&1; then
     echo "md5sum"
-  elif type -P md5 >/devnull 2>&1 || type -P md5 >/dev/null 2>&1; then
+  elif type -P md5 >/dev/null 2>&1 || type -P md5 >/dev/null 2>&1; then
     echo "md5"
   else
     arradio-msg-error "md5sum or md5 command is required"
@@ -644,6 +644,10 @@ arradio-ui-set-theme() {
   if [ -f "${ARRADIO_UI_THEME_DIR}/${ARRADIO_UI_THEME}" ]; then
     # shellcheck disable=SC1090
     . "${ARRADIO_UI_THEME_DIR}/${ARRADIO_UI_THEME}"
+    # TODO: detect COLORTEPRM=truecolor and show a message if theme is not 24-bit
+    if [ "${COLORTERM}" != "truecolor" ] && [ ${ui_theme_palette} != "8-bit" ]; then
+      arradio-msg-error "Your terminal does not support 24-bit (truecolor). Try the 8-bit variant for ${ARRADIO_UI_THEME} or use a truecolor terminal."
+    fi
     for ui_theme_var in "${ui_theme_vars[@]}"; do
       # valor mediante indirección
       val="${!ui_theme_var}"
@@ -654,7 +658,7 @@ arradio-ui-set-theme() {
           ;;
         *)
           case "${ui_theme_var}" in
-            scrollbar|preview_border|preview_scrollbar|separator|label|preview_label) : ;;
+            scrollbar|preview_border|preview_scrollbar|separator|label|preview_label|border) : ;;
             *) ui_theme_color+="${val}," ;;
           esac
           ;;
@@ -663,13 +667,13 @@ arradio-ui-set-theme() {
     ui_theme_color="${ui_theme_color%,}"
     export FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS:+$FZF_DEFAULT_OPTS }--color=${ui_theme_color}"
   else
-    arradio-msg-debug "UI theme not found; disabling colors for fzf"
+    arradio-msg-info "UI theme not found; disabling colors for fzf"
     export FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS:+$FZF_DEFAULT_OPTS }--no-color"
   fi
 }
 
 arradio-ui-list-themes() {
-  arradio-check-deps find
+  arradio-check-deps find sort
   local themes; themes="$(find "${ARRADIO_UI_THEME_DIR}" -mindepth 1 -maxdepth 1 2>/dev/null)" || true
   if [ -z "${themes}" ]; then
     arradio-msg-info "No UI themes found. More info:"
@@ -677,14 +681,18 @@ arradio-ui-list-themes() {
   else
     local msgprefix='\033[1m'; local msgsuffix='\033[0m'
     [ "${ARRADIO_NOCOLOR:-0}" -eq 1 ] && msgprefix=''
-    printf "%b%-10s  %8s  %s%b\n" "$msgprefix" "THEME" "PALETTE" "DESCRIPTION" "$msgsuffix"
-    for ui_theme in ${themes}; do
-      # shellcheck disable=SC1090
-      . "${ui_theme}"
-      if [ -n "${ui_theme_name:-}" ]; then
-        printf "%-10s  %8s  %s\n" "${ui_theme_name}" "${ui_theme_palette}" "${ui_theme_description}"
-      fi
-    done
+    printf "%b%-14s  %8s  %s%b\n" "$msgprefix" "THEME" "PALETTE" "DESCRIPTION" "$msgsuffix"
+    (
+      for ui_theme in ${themes}; do
+        unset ui_theme_name ui_theme_description ui_theme_palette
+        # shellcheck disable=SC1090
+        echo "Voy a por el fichero ${ui_theme}" >>/tmp/arradio-debug.txt
+        [ -f ${ui_theme} ] && . "${ui_theme}"
+        if [ -n "${ui_theme_name:-}" ]; then
+          printf "%-14s  %8s  %s\n" "${ui_theme_name}" "${ui_theme_palette}" "${ui_theme_description}"
+        fi
+      done
+    ) | sort -n
   fi
 }
 
@@ -695,21 +703,22 @@ arradio-ui() {
   arradio-check-deps fzf
   arradio-ui-set-theme
 
-  # Build services array (favorites always first)
-  local services=()
-  services+=(favorites)
+  # Detect fzf version
+  local fzf_ver
+  fzf_ver="$(arradio-get-fzf-version)"
+
+  # Build services list (favorites always first)
+  local services=(favorites)
   [ "${ARRADIO_ENABLE_SHOUTCAST:-1}" -eq 1 ] && services+=(shoutcast)
   [ "${ARRADIO_ENABLE_SOMAFM:-1}"  -eq 1 ] && services+=(somafm)
   [ "${ARRADIO_ENABLE_IPTV:-1}"    -eq 1 ] && services+=(iptv)
 
   # Keys for ctrl bindings
-  local keys=(f g h j k)
-  local nkeys=${#keys[@]}
-  local nservices=${#services[@]}
-
-  # Build header from enabled services only
-  local header_parts=""
+  local keys=(f g h j)
   local key_index=0
+  local header_parts=""
+
+  # Build header text dynamically
   for svc in "${services[@]}"; do
     local lbl
     case "$svc" in
@@ -725,11 +734,11 @@ arradio-ui() {
       header_parts="${header_parts} | Ctrl-${keys[key_index]} ${lbl}"
     fi
     key_index=$((key_index+1))
-    [ "$key_index" -ge "$nkeys" ] && break
+    [ "$key_index" -ge "${#keys[@]}" ] && break
   done
   local header_text=$'\n[ '"${header_parts}"$' ]\n[ ENTER to play | +/- add/del to Favorites ]\n\n'
 
-  # Helper: map service name to arradio command
+  # Helper to map service to command
   service_cmd() {
     case "$1" in
       favorites) echo "arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER}" ;;
@@ -749,50 +758,75 @@ arradio-ui() {
     esac
   }
 
-  # Build base fzf args
-  local fzf_args=(
-    --no-extended --exact
-    --layout=reverse --info=inline --cycle
-    --border=bold "--border-label= arradio v${ARRADIO_VERSION} " --border-label-pos=0
-    --header-lines=1 --no-separator --padding=1
-    --preview 'arradio info {1}'
-    --preview-window 'down,33%,border,follow'
-    --header "$header_text"
-    "--bind=enter:change-preview(arradio play {1} -p '${ARRADIO_PLAYER_CMD}')"
-    "--bind=focus:change-preview(arradio info {1})"
-    "--bind=+:reload(arradio fadd {1}; arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})+change-prompt(Favorites> )+change-preview(arradio info {1})"
-    "--bind=-:reload(arradio fdel {1}; arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})+change-prompt(Favorites> )+change-preview(arradio info {1})"
-  )
-
-  # Default service is the first entry (favorites)
+  # Default service is favorites
   local default_service="${services[0]}"
   local default_cmd; default_cmd="$(service_cmd "${default_service}")"
   local default_lbl; default_lbl="$(service_label "${default_service}")"
 
-  # Set initial prompt to default label
-  fzf_args+=( "--prompt=${default_lbl}> " )
+  # Base fzf args
+  local fzf_args=(
+    --no-extended --exact
+    --layout=reverse --info=inline --cycle
+    --header "$header_text" --header-lines=1
+  )
 
-  # Add ctrl-* bindings for each enabled service
+  # Adjust fzf args based on version
+  if [[ "$fzf_ver" != 0.[0-3]* ]]; then
+    # Use custom prompt for fzf >= 0.4.0 showing current service
+    fzf_args+=( --prompt "${default_lbl}> ")
+    # Use info in preview window for fzf >= 0.4.0
+    fzf_args+=( --preview 'arradio info {1}')
+    # Add --no-separator and --padding only for fzf >= 0.4.0
+    fzf_args+=( --no-separator --padding=1)
+    # Add --preview-window options only for fzf >= 0.4.0
+    fzf_args+=( --preview-window 'down,33%,border,follow')
+    # Add fzf border with label only for fzf >= 0.4.0
+    fzf_args+=( --border=bold "--border-label= arradio v${ARRADIO_VERSION} " --border-label-pos=0)
+    # Add advanced bindings for fzf >= 0.4.0
+    fzf_args+=( --bind "enter:change-preview(arradio play {1} -p '${ARRADIO_PLAYER_CMD}')")
+    fzf_args+=( --bind "focus:change-preview(arradio info {1})")
+    fzf_args+=( --bind "+:reload(arradio fadd {1}; arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})+change-prompt(Favorites> )+change-preview(arradio info {1})")
+    fzf_args+=( --bind "-:reload(arradio fdel {1}; arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})+change-prompt(Favorites> )+change-preview(arradio info {1})")
+  else
+    # Use custom prompt for fzf < 0.4.0
+    fzf_args+=( --prompt "arradio> ")
+    # Use arradio play in preview window for fzf < 0.4.0
+    fzf_args+=( --preview 'arradio play {1}')
+    # Use simpler preview window for fzf < 0.4.0
+    fzf_args+=( --preview-window 'down:33%')
+    # Add simple border for fzf < 0.4.0
+    fzf_args+=( --border)
+    # Add simpler bindings for fzf < 0.4.0
+    fzf_args+=( --bind "enter:ignore")
+    fzf_args+=( --bind "+:reload(arradio fadd {1}; arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})")
+    fzf_args+=( --bind "-:reload(arradio fdel {1}; arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})")  
+  fi
+
+  # Add bindings for each enabled service
   key_index=0
   for svc in "${services[@]}"; do
-    [ "$key_index" -ge "$nkeys" ] && break
+    [ "$key_index" -ge "${#keys[@]}" ] && break
     local cmd; cmd="$(service_cmd "$svc")"
     local lbl; lbl="$(service_label "$svc")"
-    fzf_args+=( "--bind=ctrl-${keys[key_index]}:reload(${cmd})+change-prompt(${lbl}> )+change-preview(arradio info {1})" )
+    # Adjust fzf args based on version
+    if [[ "$fzf_ver" != 0.[0-3]* ]]; then
+      fzf_args+=( --bind "ctrl-${keys[key_index]}:reload(${cmd})+change-prompt(${lbl}> )+change-preview(arradio info {1})")
+    else
+      fzf_args+=( --bind "ctrl-${keys[key_index]}:reload(${cmd})")
+    fi
     key_index=$((key_index+1))
   done
 
-  # Debug output (when ARRADIO_DEBUG=1)
+  # Debug information if needed
   if [ "${ARRADIO_DEBUG:-0}" -eq 1 ]; then
-    arradio-msg-debug "UI services: ${services[*]}"
-    arradio-msg-debug "Default load command: ${default_cmd}"
-    arradio-msg-debug "FZF args: ${fzf_args[*]}"
+    arradio-msg-debug "ui services: ${services[*]}"
+    arradio-msg-debug "fzf version: ${fzf_ver}"
+    arradio-msg-debug "fzf args: ${fzf_args[*]}"
   fi
 
-  # Load the default list and pipe it to fzf (guarantees initial content)
+  # Pipe default list into fzf
   eval "${default_cmd}" | fzf "${fzf_args[@]}"
 }
-
 
 # =============================================================================
 # COMMAND ROUTER
@@ -862,7 +896,7 @@ while [ "$1" ]; do
     fdel)   shift; arradio-fdel "$1"; break ;;
     flist)  arradio-flist; break ;;
     ui)     arradio-ui; break ;;
-    themes) arradio-ui-list-themes; break ;;
+    tlist)  arradio-ui-list-themes; break ;;
     env)    arradio-print-env; break ;;
     version)arradio-print-version; break ;;
     list)   arradio-list; break ;;
