@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+ui_theme_name="chalkboard"
+ui_theme_description="Dark board-like background with off-white text and subtle neon accents"
+ui_theme_palette="24-bit"
+
+# Main text
+fg='fg:#E6E6D8'
+# Preview window text
+preview_fg='preview-fg:#E6E6D8'
+# Background
+bg='bg:#0B1E0B'
+# Preview window background
+preview_bg='preview-bg:#0B1E0B'
+# Highlighted substrings
+hl='hl:#FFD97D'
+# Text (current line)
+fg_plus='fg+:#0A1B0A'
+# Background (current line)
+bg_plus='bg+:#224422'
+# Gutter on the left
+gutter='gutter:#0B1E0B'
+# Highlighted substrings (current line)
+hl_plus='hl+:#A7FFB0'
+# Info line (match counters)
+info='info:#FFD97D'
+# Border around the window (--border and --preview)
+border='border:#2E6D2E'
+# Main scrollbar
+scrollbar='scrollbar:#2E6D2E'
+# Border around the preview window (--preview)
+preview_border='preview-border:#2E6D2E'
+# Preview scrollbar
+preview_scrollbar='preview-scrollbar:#2E6D2E'
+# Horizontal separator on info line
+separator='separator:#FFD97D'
+# Border label (--border-label and --preview-label)
+label='label:#9FD3FF'
+# Border label of the preview window (--preview-label)
+preview_label='preview-label:#9FD3FF'
+# Prompt
+prompt='prompt:#9FD3FF'
+# Pointer to the current line
+pointer='pointer:#A7FFB0'
+# Multi-select marker
+marker='marker:#FFB3D9'
+# Streaming input indicator
+spinner='spinner:#FFD97D'
+# Header
+header='header:#FFD97D'

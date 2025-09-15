@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ui_theme_name="basic"
-ui_theme_description="Basic arradio UI theme designed for portability"
+ui_theme_description="Simple, portable color scheme optimized for compatibility with 256-color terminals"
 ui_theme_palette="8-bit"
 
 # Main text

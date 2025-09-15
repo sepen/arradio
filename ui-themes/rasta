@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+ui_theme_name="rasta"
+ui_theme_description="Bold red, gold, and green on a dark base for reggae-inspired energy"
+ui_theme_palette="24-bit"
+
+# Main text
+fg='fg:#f7f7f7'
+# Preview window text
+preview_fg='preview-fg:#e5e5e5'
+# Background
+bg='bg:#111111'
+# Preview window background
+preview_bg='preview-bg:#111111'
+# Highlighted substrings
+hl='hl:#f4d03f'
+# Text (current line)
+fg_plus='fg+:#ffffff'
+# Background (current line)
+bg_plus='bg+:#1a1a1a'
+# Gutter on the left
+gutter='gutter:#111111'
+# Highlighted substrings (current line)
+hl_plus='hl+:#58d68d'
+# Info line (match counters)
+info='info:#e74c3c'
+# Border around the window (--border and --preview)
+border='border:#58d68d'
+# Main scrollbar
+scrollbar='scrollbar:#58d68d'
+# Border around the preview window (--preview)
+preview_border='preview-border:#58d68d'
+# Preview scrollbar
+preview_scrollbar='preview-scrollbar:#58d68d'
+# Horizontal separator on info line
+separator='separator:#f4d03f'
+# Border label (--border-label and --preview-label)
+label='label:#e74c3c'
+# Border label of the preview window (--preview-label)
+preview_label='preview-label:#f4d03f'
+# Prompt
+prompt='prompt:#58d68d'
+# Pointer to the current line
+pointer='pointer:#f4d03f'
+# Multi-select marker
+marker='marker:#e74c3c'
+# Streaming input indicator
+spinner='spinner:#58d68d'
+# Header
+header='header:#f4d03f'

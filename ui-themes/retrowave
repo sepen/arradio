@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+ui_theme_name="retrowave"
+ui_theme_description="Deep blue background with neon pinks and cyan highlights for synthwave feels"
+ui_theme_palette="24-bit"
+
+# Main text
+fg='fg:#A0CFFF'
+# Preview window text
+preview_fg='preview-fg:#78F8FF'
+# Background
+bg='bg:#0D1B2A'
+# Preview window background
+preview_bg='preview-bg:#0D1B2A'
+# Highlighted substrings
+hl='hl:#FF66CC'
+# Text (current line)
+fg_plus='fg+:#FFFFFF'
+# Background (current line)
+bg_plus='bg+:#13334C'
+# Gutter on the left
+gutter='gutter:#0D1B2A'
+# Highlighted substrings (current line)
+hl_plus='hl+:#FF33AA'
+# Info line (match counters)
+info='info:#FFD866'
+# Border around the window (--border and --preview)
+border='border:#1A4B84'
+# Main scrollbar
+scrollbar='scrollbar:#1A4B84'
+# Border around the preview window (--preview)
+preview_border='preview-border:#1A4B84'
+# Preview scrollbar
+preview_scrollbar='preview-scrollbar:#1A4B84'
+# Horizontal separator on info line
+separator='separator:#FFD866'
+# Border label (--border-label and --preview-label)
+label='label:#FF66CC'
+# Border label of the preview window (--preview-label)
+preview_label='preview-label:#FF66CC'
+# Prompt
+prompt='prompt:#FF66CC'
+# Pointer to the current line
+pointer='pointer:#78F8FF'
+# Multi-select marker
+marker='marker:#FF33AA'
+# Streaming input indicator
+spinner='spinner:#FFAA33'
+# Header
+header='header:#FFD866'

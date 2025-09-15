@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ui_theme_name="purple"
-ui_theme_description="Only want to see you in the purple rain"
+ui_theme_description="Deep purple scheme with soft highlights for a moody yet elegant feel"
 ui_theme_palette="24-bit"
 
 # Main text

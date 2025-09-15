@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ui_theme_name="molokai"
-ui_theme_description="A color scheme for focusing based on tomasr/molokai"
+ui_theme_description="Focused dark palette with vibrant accents for coding or browsing based on tomasr/molokai"
 ui_theme_palette="24-bit"
 
 # Main text

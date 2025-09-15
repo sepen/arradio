@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ui_theme_name="nord"
-ui_theme_description="North-bluish theme based on arcticicestudio/nord-vim"
+ui_theme_description="Cool, north-inspired tones of blue, gray, and icy white based on arcticicestudio/nord-vim"
 ui_theme_palette="24-bit"
 
 # Main text

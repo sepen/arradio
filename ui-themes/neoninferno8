@@ -1,51 +1,50 @@
 #!/usr/bin/env bash
 
-ui_theme_name="molokai8"
-ui_theme_description="256-color version of the Molokai theme"
+ui_theme_name="neoninferno8"
+ui_theme_description="256-color version of the NeonInferno theme"
 ui_theme_palette="8-bit"
 
-# Main text
-fg='fg:253'
+# Main text
+fg='fg:15'
 # Preview window text
-preview_fg='preview-fg:253'
+preview_fg='preview-fg:205'
 # Background
-bg='bg:236'
+bg='bg:234'
 # Preview window background
-preview_bg='preview-bg:236'
+preview_bg='preview-bg:234'
 # Highlighted substrings
-hl='hl:239'
+hl='hl:201'
 # Text (current line)
-fg_plus='fg+:255'
+fg_plus='fg+:51'
 # Background (current line)
-bg_plus='bg+:59'
+bg_plus='bg+:237'
 # Gutter on the left
-gutter='gutter:236'
+gutter='gutter:234'
 # Highlighted substrings (current line)
-hl_plus='hl+:125'
+hl_plus='hl+:208'
 # Info line (match counters)
-info='info:154'
+info='info:226'
 # Border around the window (--border and --preview)
-border='border:250'
+border='border:199'
 # Main scrollbar
-scrollbar='scrollbar:239'
+scrollbar='scrollbar:39'
 # Border around the preview window (--preview)
-preview_border='preview-border:250'
+preview_border='preview-border:199'
 # Preview scrollbar
-preview_scrollbar='preview-scrollbar:239'
+preview_scrollbar='preview-scrollbar:39'
 # Horizontal separator on info line
-separator='separator:250'
+separator='separator:214'
 # Border label (--border-label and --preview-label)
-label='label:161'
+label='label:190'
 # Border label of the preview window (--preview-label)
-preview_label='preview-label:161'
+preview_label='preview-label:226'
 # Prompt
-prompt='prompt:161'
+prompt='prompt:49'
 # Pointer to the current line
-pointer='pointer:154'
+pointer='pointer:201'
 # Multi-select marker
-marker='marker:154'
+marker='marker:51'
 # Streaming input indicator
 spinner='spinner:226'
 # Header
-header='header:243'
-    
+header='header:51'

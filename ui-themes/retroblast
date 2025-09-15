@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+ui_theme_name="retroblast"
+ui_theme_description="Bright primaries and neon tones evoking ZX Spectrum and arcade classics"
+ui_theme_palette="24-bit"
+
+# Main text
+fg='fg:#F2F2F2'
+# Preview window text
+preview_fg='preview-fg:#F2F2F2'
+# Background
+bg='bg:#000000'
+# Preview window background
+preview_bg='preview-bg:#000000'
+# Highlighted substrings
+hl='hl:#00F0FF'
+# Text (current line)
+fg_plus='fg+:#FFFF00'
+# Background (current line)
+bg_plus='bg+:#1A1A1A'
+# Gutter on the left
+gutter='gutter:#000000'
+# Highlighted substrings (current line)
+hl_plus='hl+:#FF00FF'
+# Info line (match counters)
+info='info:#00FF00'
+# Border around the window (--border and --preview)
+border='border:#FF0000'
+# Main scrollbar
+scrollbar='scrollbar:#FF0000'
+# Border around the preview window (--preview)
+preview_border='preview-border:#FF0000'
+# Preview scrollbar
+preview_scrollbar='preview-scrollbar:#FF0000'
+# Horizontal separator on info line
+separator='separator:#00F0FF'
+# Border label (--border-label and --preview-label)
+label='label:#FFFF00'
+# Border label of the preview window (--preview-label)
+preview_label='preview-label:#FF00FF'
+# Prompt
+prompt='prompt:#00FF00'
+# Pointer to the current line
+pointer='pointer:#FF00FF'
+# Multi-select marker
+marker='marker:#00F0FF'
+# Streaming input indicator
+spinner='spinner:#FFFF00'
+# Header
+header='header:#FF0000'

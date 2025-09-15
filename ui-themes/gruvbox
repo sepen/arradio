@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ui_theme_name="gruvbox"
-ui_theme_description="Retro groove color scheme based on morhetz/gruvbox"
+ui_theme_description="Warm retro palette of earthy browns, oranges, and yellows based on morhetz/gruvbox"
 ui_theme_palette="24-bit"
 
 # Main text

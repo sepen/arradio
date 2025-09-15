@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ui_theme_name="purple8"
-ui_theme_description="256 color theme based on purple"
+ui_theme_description="256-color version of the Purple theme"
 ui_theme_palette="8-bit"
 
 # Main text

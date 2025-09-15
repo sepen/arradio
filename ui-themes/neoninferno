@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+ui_theme_name="neoninferno"
+ui_theme_description="Blazing neon accents over a subtle charcoal-purple background"
+ui_theme_palette="24-bit"
+
+# Main text
+fg='fg:#E6E6E6'
+# Preview window text
+preview_fg='preview-fg:#FF5F87'
+# Background
+bg='bg:#140016'
+# Preview window background
+preview_bg='preview-bg:#140016'
+# Highlighted substrings
+hl='hl:#FF00FF'
+# Text (current line)
+fg_plus='fg+:#00F7FF'
+# Background (current line)
+bg_plus='bg+:#262033'
+# Gutter on the left
+gutter='gutter:#140016'
+# Highlighted substrings (current line)
+hl_plus='hl+:#FF5F00'
+# Info line (match counters)
+info='info:#FFEA00'
+# Border around the window (--border and --preview)
+border='border:#FF1493'
+# Main scrollbar
+scrollbar='scrollbar:#20B2AA'
+# Border around the preview window (--preview)
+preview_border='preview-border:#FF1493'
+# Preview scrollbar
+preview_scrollbar='preview-scrollbar:#20B2AA'
+# Horizontal separator on info line
+separator='separator:#FF8C00'
+# Border label (--border-label and --preview-label)
+label='label:#ADFF2F'
+# Border label of the preview window (--preview-label)
+preview_label='preview-label:#FFD700'
+# Prompt
+prompt='prompt:#00FFAA'
+# Pointer to the current line
+pointer='pointer:#FF69B4'
+# Multi-select marker
+marker='marker:#00CED1'
+# Streaming input indicator
+spinner='spinner:#FFEA00'
+# Header
+header='header:#40E0D0'

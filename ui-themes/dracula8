@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+ui_theme_name="dracula8"
+ui_theme_description="256-color version of the Dracula theme"
+ui_theme_palette="8-bit"
+
+# Main text
+fg='fg:15'             # bright white
+# Preview window text
+preview_fg='preview-fg:15'
+# Background
+bg='bg:236'            # dark slate
+# Preview window background
+preview_bg='preview-bg:236'
+# Highlighted substrings
+hl='hl:205'            # pinkish (approx ff79c6)
+# Text (current line)
+fg_plus='fg+:84'       # greenish (approx 50fa7b)
+# Background (current line)
+bg_plus='bg+:238'      # slightly lighter than base bg
+# Gutter on the left
+gutter='gutter:236'
+# Highlighted substrings (current line)
+hl_plus='hl+:87'       # cyan-ish (approx 8be9fd)
+# Info line (match counters)
+info='info:223'        # pale yellow (approx f1fa8c)
+# Border around the window (--border and --preview)
+border='border:61'     # approx comment color (6272a4)
+# Main scrollbar
+scrollbar='scrollbar:61'
+# Border around the preview window (--preview)
+preview_border='preview-border:61'
+# Preview scrollbar
+preview_scrollbar='preview-scrollbar:61'
+# Horizontal separator on info line
+separator='separator:61'
+# Border label (--border-label and --preview-label)
+label='label:214'      # orange-ish (approx ffb86c)
+# Border label of the preview window (--preview-label)
+preview_label='preview-label:214'
+# Prompt
+prompt='prompt:214'
+# Pointer to the current line
+pointer='pointer:202'   # red-ish (approx ff5555)
+# Multi-select marker
+marker='marker:205'
+# Streaming input indicator
+spinner='spinner:87'
+# Header
+header='header:87'

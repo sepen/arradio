@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+ui_theme_name="dracula"
+ui_theme_description="Dark, high-contrast palette of purples, pinks, and teals for vivid clarity"
+ui_theme_palette="24-bit"
+
+# Main text
+fg='fg:#f8f8f2'
+# Preview window text
+preview_fg='preview-fg:#f8f8f2'
+# Background
+bg='bg:#282a36'
+# Preview window background
+preview_bg='preview-bg:#282a36'
+# Highlighted substrings
+hl='hl:#ff79c6'
+# Text (current line)
+fg_plus='fg+:#50fa7b'
+# Background (current line)
+bg_plus='bg+:#44475a'
+# Gutter on the left
+gutter='gutter:#282a36'
+# Highlighted substrings (current line)
+hl_plus='hl+:#8be9fd'
+# Info line (match counters)
+info='info:#f1fa8c'
+# Border around the window (--border and --preview)
+border='border:#6272a4'
+# Main scrollbar
+scrollbar='scrollbar:#6272a4'
+# Border around the preview window (--preview)
+preview_border='preview-border:#6272a4'
+# Preview scrollbar
+preview_scrollbar='preview-scrollbar:#6272a4'
+# Horizontal separator on info line
+separator='separator:#6272a4'
+# Border label (--border-label and --preview-label)
+label='label:#ffb86c'
+# Border label of the preview window (--preview-label)
+preview_label='preview-label:#ffb86c'
+# Prompt
+prompt='prompt:#ffb86c'
+# Pointer to the current line
+pointer='pointer:#ff5555'
+# Multi-select marker
+marker='marker:#ff79c6'
+# Streaming input indicator
+spinner='spinner:#8be9fd'
+# Header
+header='header:#8be9fd'
