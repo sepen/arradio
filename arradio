@@ -686,7 +686,6 @@ arradio-ui-list-themes() {
       for ui_theme in ${themes}; do
         unset ui_theme_name ui_theme_description ui_theme_palette
         # shellcheck disable=SC1090
-        echo "Voy a por el fichero ${ui_theme}" >>/tmp/arradio-debug.txt
         [ -f ${ui_theme} ] && . "${ui_theme}"
         if [ -n "${ui_theme_name:-}" ]; then
           printf "%-14s  %8s  %s\n" "${ui_theme_name}" "${ui_theme_palette}" "${ui_theme_description}"
