@@ -52,7 +52,7 @@ Fetch and play internet radio stations directly from the command line
 ## Installation
 
 To install [arradio](/) paste that in a macOS Terminal or Linux shell prompt:
-```shell
+```sh
 curl -fsSL https://raw.githubusercontent.com/sepen/arradio/master/arradio | bash -s install
 ```
 
@@ -71,7 +71,7 @@ arradio upgrade
 
 
 ## Usage
-```
+```sh
 arradio help
 
 Usage:
@@ -107,7 +107,7 @@ Flags:
 ### Configuration
 
 The config file, which defaults to `$HOME/.arradio/config` has the following format:
-```config
+```yaml
 # ~/.arradio/config
 
 player_cmd:     mpv --no-video
@@ -134,7 +134,9 @@ arradio ui
 ```
 
 The above can be also override by setting a value in the config file:
-```config
+```yaml
+# ~/.arradio/config
+
 ui_theme: purple
 ```
 
@@ -153,7 +155,7 @@ Playback is handled by your configured player (`player_cmd`, e.g., `mpv`, `vlc`,
 
 
 Example configuration enabling IPTV and pointing to an M3U playlist:
-```config
+```yaml
 # ~/.arradio/config
 
 player_cmd:    mpv
@@ -247,50 +249,65 @@ arradio ui
 The themes are provided separately and their installation and upgrade will be manual.
 To see the current themes available in this repository go to [ui-themes](ui-themes/).
 
-You can use any of them, but keep in mind if your terminal supports 24-bit truecolor, if not, it will be better to use the themes for 8-bit colors
+Most themes also have a 256-color (8-bit) variant for terminals that do not support 24-bit truecolor. These 8-bit variants have names ending with 8. For example, retrowave has the 8-bit variant retrowave8.
 
-| Name | Screenshot | Palette | Description |
-|------|------------|---------|-------------|
-| basic | <img src='https://user-images.githubusercontent.com/11802175/283218989-c880d89c-6e04-4e9d-a13e-f8f983241db7.png' height='25%' /> | 8-bit | Basic arradio UI theme designed for portability |
-| gruvbox | <img src='https://user-images.githubusercontent.com/11802175/283219015-c3435a75-1ca5-49c6-bbb3-fcca8738eff7.png' height='25%' /> | 24-bit | Retro groove color scheme based on morhetz/gruvbox |
-| molokai | <img src='https://user-images.githubusercontent.com/11802175/283219007-36ff52e3-1f5d-4e46-90fc-f803eb49d188.png' height='25%' /> | 24-bit | A color scheme for focusing based on tomasr/molokai |
-| nord | <img src='https://user-images.githubusercontent.com/11802175/283219010-0cb78f39-cad7-4949-890c-8e15c68eb197.png' height='25%' /> | 24-bit | North-bluish theme based on arcticicestudio/nord-vim |
-| purple | <img src='https://user-images.githubusercontent.com/11802175/283218996-50d6c815-d751-465f-9765-18c6f1c34d7b.png' height='25%' /> | 24-bit | Only want to see you in the purple rain |
-| seoul | <img src='https://user-images.githubusercontent.com/11802175/283219004-e6705984-fd13-44d8-bcfd-c29e5ced3ee5.png' height='25%' /> | 24-bit | Light theme based on junegunn/seoul256.vim |
-| seouldark | <img src='https://user-images.githubusercontent.com/11802175/283219001-b51d6b5b-5af5-4f59-b272-58f26c2eebff.png' height='25%' /> | 24-bit | Dark theme based on junegunn/seoul256.vim |
+You can use any theme, but for optimal appearance, choose the 24-bit version if your terminal supports truecolor; otherwise, use the 8-bit variant.
+
+| Name | Screenshot | Description |
+|------|------------|-------------|
+| adwaita | <img src="https://github.com/user-attachments/assets/8df78fc5-78d9-4fdf-80f5-13fa94bb5fbe" width="640" style="height:auto;" /> | Dark foundation with calm blues, natural greens, and gentle yellow accents |
+| basic | <img src='https://user-images.githubusercontent.com/11802175/283218989-c880d89c-6e04-4e9d-a13e-f8f983241db7.png' width="640" style="height:auto;" /> | Simple, portable color scheme optimized for compatibility with 256-color terminals |
+| chalkboard | <img src="https://github.com/user-attachments/assets/e31b7ce8-8cc6-4cbb-90ae-685802e0af7c" width="640" style="height:auto;" /> | Dark board-like background with off-white text and subtle neon accents |
+| dracula | <img src='https://github.com/user-attachments/assets/79496a91-9b09-4874-99ea-15490ad04892' width="640" style="height:auto;" /> | Dark, high-contrast palette of purples, pinks, and teals for vivid clarity |
+| gruvbox | <img src='https://user-images.githubusercontent.com/11802175/283219015-c3435a75-1ca5-49c6-bbb3-fcca8738eff7.png' width="640" style="height:auto;" /> | Warm retro palette of earthy browns, oranges, and yellows based on morhetz/gruvbox |
+| molokai | <img src='https://user-images.githubusercontent.com/11802175/283219007-36ff52e3-1f5d-4e46-90fc-f803eb49d188.png' width="640" style="height:auto;" /> | Focused dark palette with vibrant accents for coding or browsing based on tomasr/molokai |
+| neoninferno | <img src="https://github.com/user-attachments/assets/212198a2-7af4-44e0-b9d5-73a9fee9137c" width="640" style="height:auto;" /> | Blazing neon accents over a subtle charcoal-purple background |
+| nord | <img src='https://user-images.githubusercontent.com/11802175/283219010-0cb78f39-cad7-4949-890c-8e15c68eb197.png' width="640" style="height:auto;" /> | Cool, north-inspired tones of blue, gray, and icy white based on arcticicestudio/nord-vim |
+| partypop | <img width="640" alt="Image" src="https://github.com/user-attachments/assets/9f745c67-250a-4260-b5bf-fd466df83631" width="640" style="height:auto;" /> | Ultra-bright, festive colors with clear contrasts for a playful vibe |
+| purple | <img src='https://user-images.githubusercontent.com/11802175/283218996-50d6c815-d751-465f-9765-18c6f1c34d7b.png' width="640" style="height:auto;" /> | Deep purple scheme with soft highlights for a moody yet elegant feel |
+| rasta | <img width="640" alt="Image" src="https://github.com/user-attachments/assets/5a52b964-fca4-4636-8ffe-65db05df04d1" width="640" style="height:auto;" /> | Bold red, gold, and green on a dark base for reggae-inspired energy |
+| retroblast |<img width="640" alt="Image" src="https://github.com/user-attachments/assets/9c983a62-8266-439e-a713-a670876085f0" width="640" style="height:auto;" /> | Bright primaries and neon tones evoking ZX Spectrum and arcade classics |
+| retrowave | <img src='https://github.com/user-attachments/assets/345bdee3-e06d-4a32-aa0f-82675b7434c1' width="640" style="height:auto;" /> | Deep blue background with neon pinks and cyan highlights for synthwave feels |
+| seoul | <img src='https://user-images.githubusercontent.com/11802175/283219004-e6705984-fd13-44d8-bcfd-c29e5ced3ee5.png' width="640" style="height:auto;" /> | Light, balanced scheme with subtle contrasts for clean readability based on junegunn/seoul256.vim |
+| seouldark | <img src='https://user-images.githubusercontent.com/11802175/283219001-b51d6b5b-5af5-4f59-b272-58f26c2eebff.png' width="640" style="height:auto;" > | Dark, understated scheme with smooth contrasts for extended use based on junegunn/seoul256.vim |
+
 
 ### Installing themes
 
 This is an example about installing some themes:
 ```sh
 url="https://raw.githubusercontent.com/sepen/arradio/master/ui-themes"
-themes="molokai gruvbox nord"
+themes="dracula neoninferno partypop"
 cd $HOME/.arradio/ui-themes
 for theme in $themes; do curl -fsSL -O $url/$theme; done
 cd -
 ```
 
-To see your installed themes:
+To list all available themes locally, run:
+```sh
+arradio tlist
+
+THEME            PALETTE  DESCRIPTION
+basic              8-bit  Simple, portable color scheme optimized for compatibility with 256-color terminals
+chalkboard        24-bit  Dark board-like background with off-white text and subtle neon accents
+dracula           24-bit  Dark, high-contrast palette of purples, pinks, and teals for vivid clarity
+neoninferno       24-bit  Blazing neon accents over a subtle charcoal-purple background
+partypop          24-bit  Ultra-bright, festive colors with clear contrasts for a playful vibe
+rasta             24-bit  Bold red, gold, and green on a dark base for reggae-inspired energy
+retroblast        24-bit  Bright primaries and neon tones evoking ZX Spectrum and arcade classics
+retrowave         24-bit  Deep blue background with neon pinks and cyan highlights for synthwave feels
 ```
-arradio themes
 
-THEME        PALETTE  DESCRIPTION
-molokai       24-bit  A color scheme for focusing based on tomasr/molokai
-gruvbox       24-bit  Retro groove color scheme based on morhetz/gruvbox
-nord          24-bit  North-bluish theme based on arcticicestudio/nord-vim
-basic          8-bit  Basic arradio UI theme designed for portability
+### Selecting a Theme
+
+By default, [arradio](/) reads the default theme from your configuration file:
+```yaml
+# ~/.arradio/config
+
+ui_theme: gruvbox
 ```
 
-### Select a theme
-
-By default [arradio](/) will try to use what defined in `ARRADIO_UI_THEME` environment variable.
-
-To use another theme you should override this by doing something like this:
+You can also temporarily override the theme directly from the command line when launching arradio:
 ```sh
 arradio ui -t gruvbox
-```
-
-Or set up a config file like this:
-```config
-ui_theme: gruvbox
 ```
