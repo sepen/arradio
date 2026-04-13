@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+ui_theme_name="ptmtrx"
+ui_theme_description="PT matrix inspired soul"
+ui_theme_palette="24-bit"
+
+# Main text
+fg='fg:#F8F8F2'
+# Preview window text
+preview_fg='preview-fg:#F8F8F2'
+# Background
+bg='bg:#1B1D1E'
+# Preview window background
+preview_bg='preview-bg:#1B1D1E'
+# Highlighted substrings
+hl='hl:#7E8E91'
+# Text (current line)
+fg_plus='fg+:#F8F8F2'
+# Background (current line)
+bg_plus='bg+:#293739'
+# Gutter on the left
+gutter='gutter:#1B1D1E'
+# Highlighted substrings (current line)
+hl_plus='hl+:#F92672'
+# Info line (match counters)
+info='info:#A6E22E'
+# Border around the window (--border and --preview)
+border='border:#58d68d'
+# Main scrollbar
+scrollbar='scrollbar:#58d68d'
+# Border around the preview window (--preview)
+preview_border='preview-border:#58d68d'
+# Preview scrollbar
+preview_scrollbar='preview-scrollbar:#58d68d'
+# Horizontal separator on info line
+separator='separator:#f4d03f'
+# Border label (--border-label and --preview-label)
+#label='label:#e74c3c'
+label='label:#58d68d'
+# Border label of the preview window (--preview-label)
+preview_label='preview-label:#f4d03f'
+# Prompt
+prompt='prompt:#58d68d'
+# Pointer to the current line
+pointer='pointer:#A6E22E'
+# Multi-select marker
+marker='marker:#F92672'
+# Streaming input indicator
+#spinner='spinner:#E6DB74'
+spinner='spinner:#7E8E91'
+# Header
+header='header:#7E8E91'

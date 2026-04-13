@@ -93,9 +93,11 @@ Commands:
   fadd [stream-id]         Add to favorites
   fdel [stream-id]         Remove from favorites
   flist                    List favorites
+  frnd                     Play random favorite station
   ui                       Start UI (fzf required)
   tlist                    List installed UI themes
   env                      Show environment variables
+  keys                     Show UI keybindings
   version                  Show version
   help                     Show this help
 
@@ -226,6 +228,13 @@ arradio-set-player() {
   if ! type -P $pcmd >/dev/null 2>&1; then
     # Auto-detect player
     if type -P mpv >/dev/null 2>&1; then
+      # TODO: related to arradio-playstatus
+      # - we need to find a good output balance and discard extra stuff
+      # - the first idea behind --no-video and other options to
+      # silence the output is to better handle output differences and
+      # behaviours between mpv, vlc, etc. but on the other side
+      # we can lost some live data if we silence everything
+      #pcmd="mpv --no-video > /dev/null 2>&1"
       pcmd="mpv --no-video"
     elif [ -f /Applications/mpv.app/Contents/MacOS/mpv ]; then
       pcmd="/Applications/mpv.app/Contents/MacOS/mpv --no-video"
@@ -563,12 +572,21 @@ arradio-list() {
 }
 
 # =============================================================================
-# PLAY / INFO / FAVORITES
+# PLAY / INFO / FAVORITES / RANDOM
 # =============================================================================
 arradio-play() {
   local stream_id="$1"
   local stream_url; stream_url="$(arradio-get-stream-url "$stream_id")"
   [ -z "${stream_url}" ] && arradio-msg-error "stream_url not found for stream_id ${stream_id}"
+  # TODO: do not merge yet
+  # Give it another thought
+  # - mpv was silenced previously while defining the command
+  # - arradio-playstatus relays on cached info to show the status
+  # (current song, artist, etc.) but sometimes this is not fresh data
+  # - on the other side mpv can print live data if we can control extra stuff
+  # - finally about 2>&1 there are no other parts in the code where this is
+  # need it since the function should handle the file descriptors itself
+  #arradio-playstatus "$1" 2>&1
   arradio-set-player
   arradio-msg-info "${ARRADIO_PLAYER_CMD} ${stream_url}"
   eval "${ARRADIO_PLAYER_CMD} \"${stream_url}\""
@@ -633,6 +651,23 @@ arradio-flist() {
   done
 }
 
+arradio-playstatus() {
+  local station_name="$(grep '^name: ' "${ARRADIO_FAV_DIR}"/"${1}" 2>/dev/null)"
+  local station_info="$(grep '^info: ' "${ARRADIO_FAV_DIR}"/"${1}" 2>/dev/null)"
+  local station_genre="$(grep '^genre: ' "${ARRADIO_FAV_DIR}"/"${1}" 2>/dev/null)"
+  printf "Currently playing:\n"
+  printf "  ${station_name}\n"
+  printf "  ${station_info}\n"
+  printf "  ${station_genre}\n"
+}
+
+arradio-frnd() {
+  arradio-check-deps shuf
+  arradio-check-favorites
+  local rnd="$(find "${ARRADIO_FAV_DIR}"/* -printf "%f\n" | shuf -n 1)"
+  arradio-play "${rnd}" -p '${ARRADIO_PLAYER_CMD}'
+}
+
 # =============================================================================
 # UI THEMES
 # =============================================================================
@@ -644,8 +679,7 @@ arradio-ui-set-theme() {
   if [ -f "${ARRADIO_UI_THEME_DIR}/${ARRADIO_UI_THEME}" ]; then
     # shellcheck disable=SC1090
     . "${ARRADIO_UI_THEME_DIR}/${ARRADIO_UI_THEME}"
-    # TODO: detect COLORTEPRM=truecolor and show a message if theme is not 24-bit
-    if [ "${COLORTERM}" != "truecolor" ] && [ ${ui_theme_palette} != "8-bit" ]; then
+    if (( $(tput colors 2>/dev/null) < 256 )); then
       arradio-msg-error "Your terminal does not support 24-bit (truecolor). Try the 8-bit variant for ${ARRADIO_UI_THEME} or use a truecolor terminal."
     fi
     for ui_theme_var in "${ui_theme_vars[@]}"; do
@@ -735,7 +769,7 @@ arradio-ui() {
     key_index=$((key_index+1))
     [ "$key_index" -ge "${#keys[@]}" ] && break
   done
-  local header_text=$'\n[ '"${header_parts}"$' ]\n[ ENTER to play | +/- add/del to Favorites ]\n\n'
+  local header_text=$'\n[ '"${header_parts}"$' ]\n[ ENTER to play | +/- add/del to Favorites | Ctrl+r to play random favorite station ]\n\n'
 
   # Helper to map service to command
   service_cmd() {
@@ -778,21 +812,22 @@ arradio-ui() {
     # Add --no-separator and --padding only for fzf >= 0.4.0
     fzf_args+=( --no-separator --padding=1)
     # Add --preview-window options only for fzf >= 0.4.0
-    fzf_args+=( --preview-window 'down,33%,border,follow')
+    fzf_args+=( --preview-window 'down,15%,border,follow')
     # Add fzf border with label only for fzf >= 0.4.0
-    fzf_args+=( --border=bold "--border-label= arradio v${ARRADIO_VERSION} " --border-label-pos=0)
+    fzf_args+=( --border=bold "--border-label= arradio v${ARRADIO_VERSION} ${ui_theme_name} theme " --border-label-pos=0)
     # Add advanced bindings for fzf >= 0.4.0
     fzf_args+=( --bind "enter:change-preview(arradio play {1} -p '${ARRADIO_PLAYER_CMD}')")
     fzf_args+=( --bind "focus:change-preview(arradio info {1})")
     fzf_args+=( --bind "+:reload(arradio fadd {1}; arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})+change-prompt(Favorites> )+change-preview(arradio info {1})")
     fzf_args+=( --bind "-:reload(arradio fdel {1}; arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})+change-prompt(Favorites> )+change-preview(arradio info {1})")
+    fzf_args+=( --bind "ctrl-r:reload(arradio flist -l ${ARRADIO_OUTPUT_LIMIT} -o ${ARRADIO_OUTPUT_FILTER})+change-prompt(Favorites> )+change-preview(arradio frnd)")
   else
     # Use custom prompt for fzf < 0.4.0
     fzf_args+=( --prompt "arradio> ")
     # Use arradio play in preview window for fzf < 0.4.0
     fzf_args+=( --preview 'arradio play {1}')
     # Use simpler preview window for fzf < 0.4.0
-    fzf_args+=( --preview-window 'down:33%')
+    fzf_args+=( --preview-window 'down:15%')
     # Add simple border for fzf < 0.4.0
     fzf_args+=( --border)
     # Add simpler bindings for fzf < 0.4.0
@@ -825,6 +860,26 @@ arradio-ui() {
 
   # Pipe default list into fzf
   eval "${default_cmd}" | fzf "${fzf_args[@]}"
+}
+
+
+# =============================================================================
+# KEY BINDINGS
+# =============================================================================
+
+arradio-keybindings() {
+  cat <<EOF
+Keybindings:
+  Enter         Select | Start
+  Focus         Change selection.
+  Ctrl-f        Reload favorites.
+  Ctrl-r        Play random station from favorites.
+  Ctrl-t        Reload Shoutcast list.
+  Ctrl-y        Reload SomaFM list.
+  Ctrl-u        Reload IPTV list.
+  +             Add selection to favorites.
+  -             Remove selection to favorites.
+EOF
 }
 
 # =============================================================================
@@ -894,9 +949,11 @@ while [ "$1" ]; do
     fadd)   shift; arradio-fadd "$1"; break ;;
     fdel)   shift; arradio-fdel "$1"; break ;;
     flist)  arradio-flist; break ;;
+    frnd)   arradio-frnd; break ;;
     ui)     arradio-ui; break ;;
     tlist)  arradio-ui-list-themes; break ;;
     env)    arradio-print-env; break ;;
+    keys)   arradio-keybindings; break ;;
     version)arradio-print-version; break ;;
     list)   arradio-list; break ;;
     *) arradio-print-help; break ;;
